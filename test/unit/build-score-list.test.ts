@@ -1,5 +1,34 @@
 import { describe, expect, it } from 'vitest'
-import { buildScoreList } from '../../app/utils/build-score-list'
+import { buildScoreList, calculateClearRank } from '../../app/utils/build-score-list'
+
+describe('calculateClearRank', () => {
+  it('プレイ未実施は-を返す', () => {
+    expect(calculateClearRank(10000, false)).toBe('-')
+  })
+
+  it('ACHIEVEMENT RATEの境界値で正しいランクを返す', () => {
+    expect(calculateClearRank(0, true)).toBe('D')
+    expect(calculateClearRank(6999, true)).toBe('D')
+    expect(calculateClearRank(7000, true)).toBe('C')
+    expect(calculateClearRank(7999, true)).toBe('C')
+    expect(calculateClearRank(8000, true)).toBe('B')
+    expect(calculateClearRank(8499, true)).toBe('B')
+    expect(calculateClearRank(8500, true)).toBe('A')
+    expect(calculateClearRank(8999, true)).toBe('A')
+    expect(calculateClearRank(9000, true)).toBe('AA')
+    expect(calculateClearRank(9499, true)).toBe('AA')
+    expect(calculateClearRank(9500, true)).toBe('AAA')
+    expect(calculateClearRank(9799, true)).toBe('AAA')
+    expect(calculateClearRank(9800, true)).toBe('S')
+    expect(calculateClearRank(9849, true)).toBe('S')
+    expect(calculateClearRank(9850, true)).toBe('SS')
+    expect(calculateClearRank(9899, true)).toBe('SS')
+    expect(calculateClearRank(9900, true)).toBe('SSS')
+    expect(calculateClearRank(9949, true)).toBe('SSS')
+    expect(calculateClearRank(9950, true)).toBe('SSS+')
+    expect(calculateClearRank(10000, true)).toBe('SSS+')
+  })
+})
 
 describe('buildScoreList', () => {
   it('楽曲IDでcommonとpdataを結合して集計値を計算できる', () => {
@@ -66,6 +95,16 @@ describe('buildScoreList', () => {
     expect(rows[0]?.chartCount).toBe(2)
     expect(rows[0]?.difficultyBests).toHaveLength(5)
     expect(rows[0]?.difficultyBests[2]?.label).toBe('hard')
+    expect(rows[0]?.difficultyBests[2]?.clearRank).toBe('SSS')
+
+    const hard = rows[0]?.difficultyBests.find((item) => item.key === 'hard')
+    expect(hard?.isAllPerfect).toBe(true)
+    expect(hard?.isFullCombo).toBe(true)
+
+    const influence = rows[0]?.difficultyBests.find((item) => item.key === 'influence')
+    expect(influence?.clearRank).toBe('SSS+')
+    expect(influence?.isAllPerfect).toBe(false)
+    expect(influence?.isFullCombo).toBe(true)
   })
 
   it('pdataが無い場合は難易度別自己ベストを初期値で返す', () => {
@@ -91,5 +130,6 @@ describe('buildScoreList', () => {
     expect(rows[0]?.totalPlayCount).toBe(0)
     expect(rows[0]?.chartCount).toBe(0)
     expect(rows[0]?.difficultyBests.map((item) => item.key)).toEqual(['easy', 'normal', 'hard'])
+    expect(rows[0]?.difficultyBests.every((item) => item.clearRank === '-')).toBe(true)
   })
 })

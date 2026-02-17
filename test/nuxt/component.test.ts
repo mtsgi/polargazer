@@ -45,7 +45,10 @@ describe('コンポーネント表示', () => {
                 level: 1,
                 bestHighscore: 123456,
                 bestAchievementRate: 9987,
+                clearRank: 'SSS+',
                 totalPlayCount: 10,
+                isAllPerfect: true,
+                isFullCombo: true,
               },
               {
                 key: 'hard',
@@ -53,7 +56,10 @@ describe('コンポーネント表示', () => {
                 level: 3,
                 bestHighscore: 120000,
                 bestAchievementRate: 9900,
+                clearRank: 'SSS',
                 totalPlayCount: 4,
+                isAllPerfect: false,
+                isFullCombo: true,
               },
             ],
           },
@@ -64,6 +70,10 @@ describe('コンポーネント表示', () => {
     expect(component.text()).toContain('Song 1')
     expect(component.text()).toContain('EASY')
     expect(component.text()).toContain('HARD')
+    expect(component.text()).toContain('ACHIEVEMENT RATE')
+    expect(component.text()).toContain('CLEAR RANK')
+    expect(component.text()).toContain('AP')
+    expect(component.text()).toContain('FC')
   })
 
   it('app.vueは初期表示で未読み込みメッセージを表示する', async () => {

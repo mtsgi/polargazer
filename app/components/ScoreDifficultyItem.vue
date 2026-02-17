@@ -23,7 +23,21 @@ function formatAchievementRate(rate: number): string {
   <article class="difficulty-item">
     <header class="difficulty-item__header">
       <span class="difficulty-item__name">{{ props.difficulty.label.toUpperCase() }}</span>
-      <span class="difficulty-item__level">Lv{{ props.difficulty.level }}</span>
+      <div class="difficulty-item__meta">
+        <span
+          v-if="props.difficulty.isAllPerfect"
+          class="difficulty-item__badge"
+        >
+          AP
+        </span>
+        <span
+          v-else-if="props.difficulty.isFullCombo"
+          class="difficulty-item__badge"
+        >
+          FC
+        </span>
+        <span class="difficulty-item__level">Lv{{ props.difficulty.level }}</span>
+      </div>
     </header>
 
     <dl class="difficulty-item__stats">
@@ -32,8 +46,12 @@ function formatAchievementRate(rate: number): string {
         <dd>{{ props.difficulty.bestHighscore || '-' }}</dd>
       </div>
       <div>
-        <dt>Rate</dt>
+        <dt>ACHIEVEMENT RATE</dt>
         <dd>{{ formatAchievementRate(props.difficulty.bestAchievementRate) }}</dd>
+      </div>
+      <div>
+        <dt>CLEAR RANK</dt>
+        <dd>{{ props.difficulty.clearRank }}</dd>
       </div>
       <div>
         <dt>Play</dt>
@@ -58,15 +76,32 @@ function formatAchievementRate(rate: number): string {
   margin-bottom: 6px;
 }
 
+.difficulty-item__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .difficulty-item__name {
   font-weight: 600;
 }
 
 .difficulty-item__stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin: 0;
+}
+
+.difficulty-item__badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #e0e0e0;
+  border-radius: 999px;
+  padding: 0 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .difficulty-item__stats dt,

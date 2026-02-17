@@ -7,6 +7,11 @@ import type { PDataChart, PDataUserProfile } from './pdata'
 export type DifficultyKey = 'easy' | 'normal' | 'hard' | 'influence' | 'polar'
 
 /**
+ * 譜面のクリアランク
+ */
+export type ClearRank = 'D' | 'C' | 'B' | 'A' | 'AA' | 'AAA' | 'S' | 'SS' | 'SSS' | 'SSS+' | '-'
+
+/**
  * 楽曲マスターに定義されている難易度レベル群
  */
 export interface DifficultyLevels {
@@ -46,8 +51,14 @@ export interface DifficultyBest {
   bestHighscore: number
   /** その難易度の最高達成率（内部値: 100倍） */
   bestAchievementRate: number
+  /** その難易度のクリアランク */
+  clearRank: ClearRank
   /** その難易度の累計プレイ回数 */
   totalPlayCount: number
+  /** その難易度でALL PERFECT達成履歴があるか */
+  isAllPerfect: boolean
+  /** その難易度でFULL COMBO達成履歴があるか */
+  isFullCombo: boolean
 }
 
 /**

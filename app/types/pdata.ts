@@ -6,7 +6,7 @@ export interface PDataChart {
   chart_difficulty_type: number
   /** 譜面レベル */
   difficult: number
-  /** 達成率（100倍値） */
+  /** ACHIEVEMENT RATE（100倍値） */
   achievement_rate: number
   /** 自己ベストスコア */
   highscore: number
@@ -22,13 +22,13 @@ export interface PDataChart {
   play_count: number
   /** クリア回数 */
   clear_count: number
-  /** パーフェクトクリア回数 */
+  /** ALL PERFECT回数 */
   perfect_clear_count: number
   /** フルコンボ回数 */
   full_combo_count: number
   /** 更新日時 */
   updated_at: string
-  /** ナイスプレイランク */
+  /** PA SKILL 対象曲ランク */
   nice_play_rank: number
   /** 将来追加される未定義フィールド */
   [key: string]: unknown
