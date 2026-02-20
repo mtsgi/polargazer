@@ -1,5 +1,5 @@
 import type { CommonMusic } from '../types/common'
-import type { DifficultyBest, DifficultyKey, DifficultyLevels, NormalizedPDataMusic, ScoreSongRow } from '../types/view-model'
+import type { ClearRank, DifficultyBest, DifficultyKey, DifficultyLevels, NormalizedPDataMusic, ScoreSongRow } from '../types/view-model'
 
 /**
  * pdataのchart_difficulty_typeをPolargazerの難易度キーに変換するマップ。
@@ -21,6 +21,44 @@ const DIFFICULTY_LABEL_MAP: Record<DifficultyKey, string> = {
   hard: 'hard',
   influence: 'influence',
   polar: 'polar',
+}
+
+/**
+ * ACHIEVEMENT RATE（100倍値）とプレイ有無からクリアランクを算出する
+ */
+export function calculateClearRank(achievementRate: number, hasPlayed: boolean): ClearRank {
+  if (!hasPlayed) {
+    return '-'
+  }
+
+  if (achievementRate >= 9950) {
+    return 'SSS+'
+  }
+  if (achievementRate >= 9900) {
+    return 'SSS'
+  }
+  if (achievementRate >= 9850) {
+    return 'SS'
+  }
+  if (achievementRate >= 9800) {
+    return 'S'
+  }
+  if (achievementRate >= 9500) {
+    return 'AAA'
+  }
+  if (achievementRate >= 9000) {
+    return 'AA'
+  }
+  if (achievementRate >= 8500) {
+    return 'A'
+  }
+  if (achievementRate >= 8000) {
+    return 'B'
+  }
+  if (achievementRate >= 7000) {
+    return 'C'
+  }
+  return 'D'
 }
 
 export function buildScoreList(commonList: CommonMusic[], pdataList: NormalizedPDataMusic[]): ScoreSongRow[] {
@@ -49,6 +87,13 @@ export function buildScoreList(commonList: CommonMusic[], pdataList: NormalizedP
       best.bestHighscore = Math.max(best.bestHighscore, chart.highscore)
       best.bestAchievementRate = Math.max(best.bestAchievementRate, chart.achievement_rate)
       best.totalPlayCount += chart.play_count
+      best.isAllPerfect = best.isAllPerfect || chart.perfect_clear_count > 0
+      best.isFullCombo = best.isFullCombo || chart.full_combo_count > 0
+    }
+
+    // 集約が完了した後に一度だけクリアランクを算出する。
+    for (const best of difficultyBestMap.values()) {
+      best.clearRank = calculateClearRank(best.bestAchievementRate, best.totalPlayCount > 0)
     }
 
     const difficultyBests = Array.from(difficultyBestMap.values())
@@ -94,7 +139,10 @@ function initializeDifficultyBestMap(music: CommonMusic): Map<DifficultyKey, Dif
         level,
         bestHighscore: 0,
         bestAchievementRate: 0,
+        clearRank: '-',
         totalPlayCount: 0,
+        isAllPerfect: false,
+        isFullCombo: false,
       },
     ])
   }
