@@ -167,14 +167,12 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
       Polargazer
     </h1>
 
-    <section class="app__panel">
-      <DataSourceForm
-        v-model:common-url="sourceUrls.commonUrl"
-        v-model:pdata-url="sourceUrls.pdataUrl"
-        :loading="isLoading"
-        @submit="loadScoreData"
-      />
-    </section>
+    <DataSourceForm
+      v-model:common-url="sourceUrls.commonUrl"
+      v-model:pdata-url="sourceUrls.pdataUrl"
+      :loading="isLoading"
+      @submit="loadScoreData"
+    />
 
     <p v-if="!hasRequestedLoad" class="app__notice">
       未読み込みです。URLを確認して「Load Data」を押してください。
@@ -215,6 +213,7 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
   padding: 12px;
   display: grid;
   gap: 12px;
+  color: var(--pg-color-text-main);
 }
 
 .app__title,
@@ -222,12 +221,22 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
   margin: 0;
 }
 
-.app__panel {
-  border: 1px solid #d6d6d6;
-  border-radius: 12px;
-  padding: 12px;
-  display: grid;
-  gap: 12px;
+.app__title {
+  text-align: center;
+  display: inline-block;
+  font-size: clamp(2.2rem, 6.2vw, 3.8rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.05;
+  color: var(--pg-color-white);
+  -webkit-text-stroke: 1px var(--pg-color-text-main);
+  text-shadow:
+    -2px -2px 0 var(--pg-color-accent-pink),
+    2px -2px 0 var(--pg-color-accent-soft),
+    -2px 2px 0 var(--pg-color-accent-soft),
+    2px 2px 0 var(--pg-color-accent-pink),
+    0 7px 0 var(--pg-color-border);
+  margin-bottom: 10px;
 }
 
 .app__songs {
@@ -242,9 +251,16 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
 }
 
 .app__error {
-  border: 1px solid #d6d6d6;
+  border: 1px solid var(--pg-color-error);
   border-radius: 8px;
   padding: 8px;
+  color: var(--pg-color-error);
+  background: color-mix(in srgb, var(--pg-color-error) 10%, white);
+}
+
+.app__notice,
+.app__count {
+  color: var(--pg-color-text-sub);
 }
 
 @media (min-width: 900px) {

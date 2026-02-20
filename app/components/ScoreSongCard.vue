@@ -35,11 +35,12 @@ const props = defineProps<Props>()
 
 <style scoped lang="scss">
 .song-card {
-  border: 1px solid #d6d6d6;
+  border: 3px solid var(--pg-color-border);
   border-radius: 12px;
   padding: 12px;
   display: grid;
   gap: 10px;
+  background: var(--pg-color-white);
 }
 
 .song-card__header {
@@ -52,10 +53,16 @@ const props = defineProps<Props>()
   font-size: 1rem;
 }
 
-.song-card__composer,
+.song-card__composer {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--pg-color-text-sub);
+}
+
 .song-card__summary {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.75rem;
+  color: var(--pg-color-text-sub);
 }
 
 .song-card__difficulties {

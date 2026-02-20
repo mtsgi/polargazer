@@ -34,8 +34,10 @@ const props = defineProps<Props>()
 
 .song-list__empty {
   margin: 0;
-  border: 1px dashed #bfbfbf;
+  border: 1px dashed var(--pg-color-border);
   border-radius: 8px;
   padding: 12px;
+  color: var(--pg-color-text-sub);
+  background: color-mix(in srgb, var(--pg-color-surface-soft) 35%, white);
 }
 </style>

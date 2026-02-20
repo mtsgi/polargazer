@@ -26,11 +26,17 @@ const props = withDefaults(defineProps<Props>(), {
 .ui-button {
   min-height: 38px;
   padding: 8px 14px;
-  border: 1px solid #9a9a9a;
+  border: 2px solid var(--pg-color-border);
   border-radius: 8px;
-  background: #fff;
+  background: color-mix(in srgb, var(--pg-color-accent-soft) 28%, var(--pg-color-white));
+  color: var(--pg-color-text-main);
   font: inherit;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover:enabled {
+    background: var(--pg-color-accent-soft);
+  }
 
   &:disabled {
     cursor: default;

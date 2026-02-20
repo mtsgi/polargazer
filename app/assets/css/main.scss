@@ -1,0 +1,57 @@
+:root {
+  font-family: "Zen Maru Gothic", sans-serif;
+  --pg-color-white: #ffffff;
+  --pg-color-text-main: #695ca7;
+  --pg-color-text-sub: #ada3e0;
+  --pg-color-border: #fbe0ff;
+  --pg-color-error: #ff748b;
+  --pg-color-bg-base: #ebd9ee;
+  --pg-color-surface: #fdffdb;
+  --pg-color-surface-soft: #ddcdfa;
+  --pg-color-accent-soft: #d4cef9;
+  --pg-color-accent-warm: #e57c8d;
+  --pg-color-accent-pink: #e8c8db;
+
+  --pg-difficulty-easy: #00c6ff;
+  --pg-difficulty-normal: #00bf69;
+  --pg-difficulty-hard: #ffa800;
+  --pg-difficulty-influence: #ff55ac;
+  --pg-difficulty-polar: #c83ef9;
+
+  --pg-badge-ap: #f4d972;
+  --pg-badge-fc: #dea7f9;
+}
+
+body {
+  margin: 0;
+  color: var(--pg-color-text-main);
+  background-color: var(--pg-color-white);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(212, 206, 249, 0.2) 0,
+      rgba(212, 206, 249, 0.2) 2px,
+      transparent 2px,
+      transparent 100px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(212, 206, 249, 0.2) 0,
+      rgba(212, 206, 249, 0.2) 2px,
+      transparent 2px,
+      transparent 100px
+    );
+  background-size: 100px 100px;
+  background-position: 0 0, 0 0;
+  animation: pg-grid-flow 10s linear infinite;
+}
+
+@keyframes pg-grid-flow {
+  from {
+    background-position: 0 0, 0 0;
+  }
+
+  to {
+    background-position: 100px 100px, 100px 100px;
+  }
+}

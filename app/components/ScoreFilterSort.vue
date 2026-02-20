@@ -79,14 +79,19 @@ const emit = defineEmits<{
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
-  border: 1px solid #d6d6d6;
+  border: 3px solid var(--pg-color-border);
   border-radius: 10px;
   padding: 10px;
+  background: color-mix(in srgb, var(--pg-color-surface-soft) 34%, white);
 }
 
 .sort-filter__field {
   display: grid;
   gap: 6px;
+}
+
+.sort-filter__field label {
+  color: var(--pg-color-text-sub);
 }
 
 @media (min-width: 720px) {

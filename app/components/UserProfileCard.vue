@@ -30,7 +30,7 @@ function skillGradeClass(grade: string): string {
 <template>
   <section class="profile-card">
     <h2 class="profile-card__title">
-      Player
+      プロフィール
     </h2>
 
     <dl class="profile-card__grid">
@@ -67,9 +67,10 @@ function skillGradeClass(grade: string): string {
 
 <style scoped lang="scss">
 .profile-card {
-  border: 1px solid #d6d6d6;
+  border: 3px solid var(--pg-color-border);
   border-radius: 10px;
   padding: 12px;
+  background: var(--pg-color-white);
 }
 
 .profile-card__title {
@@ -96,6 +97,14 @@ function skillGradeClass(grade: string): string {
   margin: 0;
 }
 
+.profile-card__item dt {
+  color: var(--pg-color-text-sub);
+}
+
+.profile-card__item dd {
+  font-weight: 900;
+}
+
 .profile-card__grade {
   display: inline-flex;
   align-items: center;
@@ -103,7 +112,7 @@ function skillGradeClass(grade: string): string {
   min-width: 72px;
   padding: 2px 10px;
   border-radius: 999px;
-  font-weight: 700;
+  font-weight: 900;
   font-size: 0.85rem;
   line-height: 1.4;
   color: #1f1f1f;
