@@ -222,11 +222,15 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
   margin: 0;
 }
 
-.app__panel,
-.app__songs {
+.app__panel {
   border: 1px solid #d6d6d6;
   border-radius: 12px;
   padding: 12px;
+  display: grid;
+  gap: 12px;
+}
+
+.app__songs {
   display: grid;
   gap: 12px;
 }

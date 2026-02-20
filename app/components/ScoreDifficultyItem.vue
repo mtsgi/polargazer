@@ -15,7 +15,7 @@ function formatAchievementRate(rate: number): string {
   if (!rate) {
     return '-'
   }
-  return (rate / 100).toFixed(2)
+  return (rate / 100).toFixed(2) + '%'
 }
 </script>
 
@@ -42,16 +42,16 @@ function formatAchievementRate(rate: number): string {
 
     <dl class="difficulty-item__stats">
       <div>
-        <dt>Score</dt>
-        <dd>{{ props.difficulty.bestHighscore || '-' }}</dd>
+        <dt>CLEAR RANK</dt>
+        <dd>{{ props.difficulty.clearRank }}</dd>
       </div>
       <div>
         <dt>ACHIEVEMENT RATE</dt>
         <dd>{{ formatAchievementRate(props.difficulty.bestAchievementRate) }}</dd>
       </div>
       <div>
-        <dt>CLEAR RANK</dt>
-        <dd>{{ props.difficulty.clearRank }}</dd>
+        <dt>Score</dt>
+        <dd>{{ props.difficulty.bestHighscore || '-' }}</dd>
       </div>
       <div>
         <dt>Play</dt>

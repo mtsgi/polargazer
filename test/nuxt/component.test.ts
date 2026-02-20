@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import DataSourceForm from '../../app/components/DataSourceForm.vue'
 import ScoreSongTable from '../../app/components/ScoreSongTable.vue'
+import UserProfileCard from '../../app/components/UserProfileCard.vue'
 import App from '../../app/app.vue'
 
 describe('コンポーネント表示', () => {
@@ -79,5 +80,25 @@ describe('コンポーネント表示', () => {
   it('app.vueは初期表示で未読み込みメッセージを表示する', async () => {
     const component = await mountSuspended(App)
     expect(component.text()).toContain('未読み込みです。URLを確認して「Load Data」を押してください。')
+  })
+
+  it('UserProfileCardでPA SKILLグレードを表示できる', async () => {
+    const component = await mountSuspended(UserProfileCard, {
+      props: {
+        profile: {
+          usr_name: 'tester',
+          usr_rank: 1,
+          comment: '',
+          is_tutorial_cleared: true,
+          exp: 100,
+          pa_class: 2,
+          pa_skill: '15.60',
+        },
+      },
+    })
+
+    expect(component.text()).toContain('スキル')
+    expect(component.text()).toContain('スキルグレード')
+    expect(component.text()).toContain('Navy+')
   })
 })
