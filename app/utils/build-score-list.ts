@@ -89,6 +89,10 @@ export function buildScoreList(commonList: CommonMusic[], pdataList: NormalizedP
       best.totalPlayCount += chart.play_count
       best.isAllPerfect = best.isAllPerfect || chart.perfect_clear_count > 0
       best.isFullCombo = best.isFullCombo || chart.full_combo_count > 0
+    }
+
+    // 集約が完了した後に一度だけクリアランクを算出する。
+    for (const best of difficultyBestMap.values()) {
       best.clearRank = calculateClearRank(best.bestAchievementRate, best.totalPlayCount > 0)
     }
 
