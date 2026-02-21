@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import type { ScoreSongRow } from './types/view-model'
+import type { DifficultyBest, ScoreSongRow } from './types/view-model'
 import type { SortKey } from './components/ScoreFilterSort.vue'
 import { loadDataSourceUrls, saveDataSourceUrls } from './composables/useDataSourceStorage'
 import { useScoreDataLoader } from './composables/useScoreDataLoader'
 
 type DifficultyKey = 'easy' | 'normal' | 'hard' | 'influence' | 'polar'
 type DifficultyMetrics = Record<DifficultyKey, { rate: number, playCount: number }>
+
+interface SelectedDifficultyDetail {
+  /** 表示対象の楽曲行 */
+  row: ScoreSongRow
+  /** 表示対象の難易度データ */
+  difficulty: DifficultyBest
+}
 
 const DIFFICULTY_KEYS: DifficultyKey[] = ['easy', 'normal', 'hard', 'influence', 'polar']
 
@@ -19,6 +26,10 @@ const debouncedSearchWord = ref('')
 const sortKey = ref<SortKey>('nameAsc')
 // 初回ロード実行前かどうかを判定する。
 const hasRequestedLoad = ref(false)
+// 難易度詳細モーダル表示状態。
+const isDifficultyModalOpen = ref(false)
+// 難易度詳細モーダルの表示対象。
+const selectedDifficultyDetail = ref<SelectedDifficultyDetail | null>(null)
 
 const {
   isLoading,
@@ -115,6 +126,34 @@ async function loadScoreData() {
 }
 
 /**
+ * 難易度詳細モーダルを開く
+ */
+function handleSelectDifficulty(payload: SelectedDifficultyDetail) {
+  selectedDifficultyDetail.value = payload
+  isDifficultyModalOpen.value = true
+}
+
+/**
+ * 難易度詳細モーダルの表示状態変更を処理する
+ */
+function handleDifficultyModalVisibility(value: boolean) {
+  if (!value) {
+    closeDifficultyModal()
+    return
+  }
+
+  isDifficultyModalOpen.value = true
+}
+
+/**
+ * 難易度詳細モーダルを閉じる
+ */
+function closeDifficultyModal() {
+  isDifficultyModalOpen.value = false
+  selectedDifficultyDetail.value = null
+}
+
+/**
  * 指定難易度の達成率を取得する。
  */
 function getDifficultyRate(cache: Map<string, DifficultyMetrics>, row: ScoreSongRow, key: DifficultyKey): number {
@@ -157,6 +196,7 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
 
   return cache
 }
+
 </script>
 
 <template>
@@ -201,8 +241,17 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
         表示件数: {{ filteredRows.length }}
       </p>
 
-      <ScoreSongTable :rows="filteredRows" />
+      <ScoreSongTable
+        :rows="filteredRows"
+        @select-difficulty="handleSelectDifficulty"
+      />
     </section>
+
+    <DifficultyDetailModal
+      :model-value="isDifficultyModalOpen"
+      :detail="selectedDifficultyDetail"
+      @update:model-value="handleDifficultyModalVisibility"
+    />
   </main>
 </template>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ScoreSongRow } from '../types/view-model'
+import type { DifficultyBest, ScoreSongRow } from '../types/view-model'
 
 interface Props {
   /** 一覧表示する楽曲行データ */
@@ -7,6 +7,17 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  selectDifficulty: [payload: { row: ScoreSongRow, difficulty: DifficultyBest }]
+}>()
+
+/**
+ * 子コンポーネントからの難易度選択イベントを親へ中継する
+ */
+function handleSelectDifficulty(payload: { row: ScoreSongRow, difficulty: DifficultyBest }) {
+  emit('selectDifficulty', payload)
+}
 </script>
 
 <template>
@@ -20,6 +31,7 @@ const props = defineProps<Props>()
         v-for="row in props.rows"
         :key="row.musicId"
         :row="row"
+        @select-difficulty="handleSelectDifficulty"
       />
     </template>
   </section>
