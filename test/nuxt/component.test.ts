@@ -48,6 +48,16 @@ describe('コンポーネント表示', () => {
                 bestAchievementRate: 9987,
                 clearRank: 'SSS+',
                 totalPlayCount: 10,
+                maxCombo: 200,
+                comboRank: 8,
+                scoreRank: 8,
+                clearStatus: 4,
+                clearCount: 10,
+                allPerfectCount: 2,
+                fullComboCount: 3,
+                latestUpdatedAt: '2025-01-03 01:02:03',
+                nicePlayRank: 5,
+                chartLevelFromPdata: 1,
                 isAllPerfect: true,
                 isFullCombo: true,
               },
@@ -59,6 +69,16 @@ describe('コンポーネント表示', () => {
                 bestAchievementRate: 9900,
                 clearRank: 'SSS',
                 totalPlayCount: 4,
+                maxCombo: 100,
+                comboRank: 7,
+                scoreRank: 8,
+                clearStatus: 3,
+                clearCount: 4,
+                allPerfectCount: 0,
+                fullComboCount: 2,
+                latestUpdatedAt: '2025-01-02 01:02:03',
+                nicePlayRank: 3,
+                chartLevelFromPdata: 3,
                 isAllPerfect: false,
                 isFullCombo: true,
               },
@@ -75,6 +95,62 @@ describe('コンポーネント表示', () => {
     expect(component.text()).toContain('CLEAR RANK')
     expect(component.text()).toContain('AP')
     expect(component.text()).toContain('FC')
+  })
+
+  it('ScoreSongTableで難易度クリック時に選択イベントを発火できる', async () => {
+    const component = await mountSuspended(ScoreSongTable, {
+      props: {
+        rows: [
+          {
+            musicId: 'm1',
+            name: 'Song 1',
+            composer: 'Comp',
+            genre: 1,
+            levels: {
+              easy: 1,
+              normal: 2,
+              hard: 3,
+              influence: 4,
+              polar: 5,
+            },
+            bestHighscore: 123456,
+            bestAchievementRate: 9987,
+            totalPlayCount: 10,
+            chartCount: 1,
+            difficultyBests: [
+              {
+                key: 'easy',
+                label: 'easy',
+                level: 1,
+                bestHighscore: 123456,
+                bestAchievementRate: 9987,
+                clearRank: 'SSS+',
+                totalPlayCount: 10,
+                maxCombo: 200,
+                comboRank: 8,
+                scoreRank: 8,
+                clearStatus: 4,
+                clearCount: 10,
+                allPerfectCount: 2,
+                fullComboCount: 3,
+                latestUpdatedAt: '2025-01-03 01:02:03',
+                nicePlayRank: 5,
+                chartLevelFromPdata: 1,
+                isAllPerfect: true,
+                isFullCombo: true,
+              },
+            ],
+          },
+        ],
+      },
+    })
+
+    await component.get('.difficulty-item').trigger('click')
+
+    const emitted = component.emitted('selectDifficulty')
+    expect(emitted).toBeTruthy()
+    expect(emitted?.[0]?.[0]?.row.musicId).toBe('m1')
+    expect(emitted?.[0]?.[0]?.difficulty.key).toBe('easy')
   })
 
   it('app.vueは初期表示で未読み込みメッセージを表示する', async () => {

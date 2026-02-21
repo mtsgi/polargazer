@@ -55,6 +55,26 @@ export interface DifficultyBest {
   clearRank: ClearRank
   /** その難易度の累計プレイ回数 */
   totalPlayCount: number
+  /** その難易度の最大コンボ */
+  maxCombo: number
+  /** その難易度の最高コンボランク */
+  comboRank: number
+  /** その難易度の最高スコアランク */
+  scoreRank: number
+  /** その難易度の最高クリア状況 */
+  clearStatus: number
+  /** その難易度の累計クリア回数 */
+  clearCount: number
+  /** その難易度の累計ALL PERFECT回数 */
+  allPerfectCount: number
+  /** その難易度の累計FULL COMBO回数 */
+  fullComboCount: number
+  /** その難易度の最新更新日時 */
+  latestUpdatedAt: string | null
+  /** その難易度の最高PA SKILL対象曲ランク */
+  nicePlayRank: number
+  /** pdata由来の譜面レベル */
+  chartLevelFromPdata: number
   /** その難易度でALL PERFECT達成履歴があるか */
   isAllPerfect: boolean
   /** その難易度でFULL COMBO達成履歴があるか */
