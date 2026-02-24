@@ -90,7 +90,7 @@ function formatLocalDateTime(value: string | null): string {
           <dd>{{ props.detail.difficulty.clearRank }}</dd>
         </div>
         <div>
-          <dt>達成率（ACHIEVEMENT RATE）</dt>
+          <dt>ACHIEVEMENT RATE</dt>
           <dd>{{ formatAchievementRate(props.detail.difficulty.bestAchievementRate) }}</dd>
         </div>
         <div>

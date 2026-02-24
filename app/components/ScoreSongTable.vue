@@ -1,15 +1,23 @@
 <script setup lang="ts">
 import type { DifficultyBest, ScoreSongRow } from '../types/view-model'
+import ScorePagination from './ScorePagination.vue'
 
 interface Props {
   /** 一覧表示する楽曲行データ */
   rows: ScoreSongRow[]
+  /** 現在ページ */
+  currentPage: number
+  /** 全件数 */
+  totalItems: number
+  /** 1ページあたりの表示件数 */
+  pageSize: number
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
   selectDifficulty: [payload: { row: ScoreSongRow, difficulty: DifficultyBest }]
+  'update:currentPage': [value: number]
 }>()
 
 /**
@@ -22,6 +30,13 @@ function handleSelectDifficulty(payload: { row: ScoreSongRow, difficulty: Diffic
 
 <template>
   <section class="song-list">
+    <ScorePagination
+      :current-page="props.currentPage"
+      :total-items="props.totalItems"
+      :page-size="props.pageSize"
+      @update:current-page="emit('update:currentPage', $event)"
+    />
+
     <p v-if="props.rows.length === 0" class="song-list__empty">
       表示対象の楽曲がありません。
     </p>
@@ -34,6 +49,14 @@ function handleSelectDifficulty(payload: { row: ScoreSongRow, difficulty: Diffic
         @select-difficulty="handleSelectDifficulty"
       />
     </template>
+
+    <ScorePagination
+      class="song-list__pagination--bottom"
+      :current-page="props.currentPage"
+      :total-items="props.totalItems"
+      :page-size="props.pageSize"
+      @update:current-page="emit('update:currentPage', $event)"
+    />
   </section>
 </template>
 
@@ -42,6 +65,10 @@ function handleSelectDifficulty(payload: { row: ScoreSongRow, difficulty: Diffic
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
+}
+
+.song-list__pagination--bottom {
+  margin-top: 4px;
 }
 
 .song-list__empty {

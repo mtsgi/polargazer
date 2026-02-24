@@ -28,8 +28,6 @@ function formatAchievementRate(rate: number): string {
 <template>
   <button
     class="difficulty-item"
-    type="button"
-    :class="`difficulty-item--${props.difficulty.key}`"
     @click="emit('select', props.difficulty)"
   >
     <!-- 楽曲レベル -->
