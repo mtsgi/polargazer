@@ -90,6 +90,7 @@ describe('コンポーネント表示', () => {
         currentPage: 1,
         totalItems: 1,
         pageSize: 50,
+        hideUnplayedDifficulties: false,
       },
     })
 
@@ -150,6 +151,7 @@ describe('コンポーネント表示', () => {
         currentPage: 1,
         totalItems: 1,
         pageSize: 50,
+        hideUnplayedDifficulties: false,
       },
     })
 
@@ -210,6 +212,7 @@ describe('コンポーネント表示', () => {
         currentPage: 1,
         totalItems: 2,
         pageSize: 1,
+        hideUnplayedDifficulties: false,
       },
     })
 
@@ -227,6 +230,8 @@ describe('コンポーネント表示', () => {
         sortField: 'default',
         sortOrder: 'asc',
         pageSize: '50',
+        filterConditions: [],
+        hideUnplayedDifficulties: false,
       },
     })
 
@@ -237,6 +242,105 @@ describe('コンポーネント表示', () => {
     expect(component.emitted('update:sortField')?.[0]?.[0]).toBe('easyLevel')
     expect(component.emitted('update:sortOrder')?.[0]?.[0]).toBe('desc')
     expect(component.emitted('update:pageSize')?.[0]?.[0]).toBe('20')
+  })
+
+  it('ScoreFilterSortで条件追加と未プレイ非表示更新を発火できる', async () => {
+    const component = await mountSuspended(ScoreFilterSort, {
+      props: {
+        searchWord: '',
+        sortField: 'default',
+        sortOrder: 'asc',
+        pageSize: '50',
+        filterConditions: [],
+        hideUnplayedDifficulties: false,
+      },
+    })
+
+    await component.get('.sort-filter__condition-header .ui-button').trigger('click')
+    await component.get('input#hide-unplayed-difficulties').setValue(true)
+
+    const emittedConditions = component.emitted('update:filterConditions')
+    expect(emittedConditions).toBeTruthy()
+    expect((emittedConditions?.[0]?.[0] as Array<{ type: string }>)[0]?.type).toBe('level')
+    expect(component.emitted('update:hideUnplayedDifficulties')?.[0]?.[0]).toBe(true)
+  })
+
+  it('ScoreSongTableで未プレイ難易度非表示を反映できる', async () => {
+    const component = await mountSuspended(ScoreSongTable, {
+      props: {
+        rows: [
+          {
+            musicId: 'm1',
+            name: 'Song 1',
+            composer: 'Comp',
+            genre: 1,
+            levels: {
+              easy: 1,
+              normal: 2,
+              hard: 3,
+              influence: 4,
+              polar: 5,
+            },
+            bestHighscore: 123456,
+            bestAchievementRate: 9987,
+            totalPlayCount: 10,
+            chartCount: 2,
+            difficultyBests: [
+              {
+                key: 'easy',
+                label: 'easy',
+                level: 1,
+                bestHighscore: 123456,
+                bestAchievementRate: 9987,
+                clearRank: 'SSS+',
+                totalPlayCount: 0,
+                maxCombo: 0,
+                comboRank: 0,
+                scoreRank: 0,
+                clearStatus: 0,
+                clearCount: 0,
+                allPerfectCount: 0,
+                fullComboCount: 0,
+                latestUpdatedAt: null,
+                nicePlayRank: 0,
+                chartLevelFromPdata: 1,
+                isAllPerfect: false,
+                isFullCombo: false,
+              },
+              {
+                key: 'hard',
+                label: 'hard',
+                level: 3,
+                bestHighscore: 120000,
+                bestAchievementRate: 9900,
+                clearRank: 'SSS',
+                totalPlayCount: 4,
+                maxCombo: 100,
+                comboRank: 7,
+                scoreRank: 8,
+                clearStatus: 3,
+                clearCount: 4,
+                allPerfectCount: 0,
+                fullComboCount: 2,
+                latestUpdatedAt: '2025-01-02 01:02:03',
+                nicePlayRank: 3,
+                chartLevelFromPdata: 3,
+                isAllPerfect: false,
+                isFullCombo: true,
+              },
+            ],
+          },
+        ],
+        currentPage: 1,
+        totalItems: 1,
+        pageSize: 50,
+        hideUnplayedDifficulties: true,
+      },
+    })
+
+    expect(component.findAll('.difficulty-item')).toHaveLength(1)
+    expect(component.text()).toContain('HARD')
+    expect(component.text()).not.toContain('EASY')
   })
 
   it('app.vueは初期表示で未読み込みメッセージを表示する', async () => {

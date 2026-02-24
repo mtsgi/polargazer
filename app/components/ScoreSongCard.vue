@@ -4,9 +4,19 @@ import type { DifficultyBest, ScoreSongRow } from '../types/view-model'
 interface Props {
   /** 表示対象の楽曲行データ */
   row: ScoreSongRow
+  /** 未プレイ難易度を非表示にするか */
+  hideUnplayedDifficulties: boolean
 }
 
 const props = defineProps<Props>()
+
+const visibleDifficulties = computed(() => {
+  if (!props.hideUnplayedDifficulties) {
+    return props.row.difficultyBests
+  }
+
+  return props.row.difficultyBests.filter((difficulty) => difficulty.totalPlayCount > 0)
+})
 
 const emit = defineEmits<{
   selectDifficulty: [payload: { row: ScoreSongRow, difficulty: DifficultyBest }]
@@ -39,7 +49,7 @@ function handleSelectDifficulty(difficulty: DifficultyBest) {
 
     <section class="song-card__difficulties">
       <ScoreDifficultyItem
-        v-for="difficulty in props.row.difficultyBests"
+        v-for="difficulty in visibleDifficulties"
         :key="`${props.row.musicId}-${difficulty.key}`"
         :difficulty="difficulty"
         @select="handleSelectDifficulty"

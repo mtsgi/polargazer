@@ -11,6 +11,8 @@ interface Props {
   totalItems: number
   /** 1ページあたりの表示件数 */
   pageSize: number
+  /** 未プレイ難易度を非表示にするか */
+  hideUnplayedDifficulties: boolean
 }
 
 const props = defineProps<Props>()
@@ -46,6 +48,7 @@ function handleSelectDifficulty(payload: { row: ScoreSongRow, difficulty: Diffic
         v-for="row in props.rows"
         :key="row.musicId"
         :row="row"
+        :hide-unplayed-difficulties="props.hideUnplayedDifficulties"
         @select-difficulty="handleSelectDifficulty"
       />
     </template>

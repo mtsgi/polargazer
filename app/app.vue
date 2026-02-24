@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import type { DifficultyBest, DifficultyKey, ScoreSongRow } from './types/view-model'
+import type { DifficultyBest, DifficultyKey, ScoreSongRow, SongFilterCondition } from './types/view-model'
 import type { PageSizeOption, SortField, SortOrder } from './components/ScoreFilterSort.vue'
 import { loadDataSourceUrls, saveDataSourceUrls } from './composables/useDataSourceStorage'
 import { useScoreDataLoader } from './composables/useScoreDataLoader'
+import { filterRowsByConditions } from './utils/filter-score-rows'
 
 type DifficultyMetrics = Record<DifficultyKey, { rate: number, playCount: number }>
 
@@ -27,6 +28,10 @@ const sortField = ref<SortField>('default')
 const sortOrder = ref<SortOrder>('asc')
 // 一覧の表示件数。
 const pageSize = ref<PageSizeOption>('50')
+// 一覧の追加絞り込み条件。
+const filterConditions = ref<SongFilterCondition[]>([])
+// 未プレイ難易度を非表示にするかどうか。
+const hideUnplayedDifficulties = ref(false)
 // 一覧の現在ページ。
 const currentPage = ref(1)
 // 初回ロード実行前かどうかを判定する。
@@ -61,7 +66,7 @@ onUnmounted(() => {
   }
 })
 
-watch([debouncedSearchWord, sortField, sortOrder, pageSize], () => {
+watch([debouncedSearchWord, sortField, sortOrder, pageSize, filterConditions], () => {
   currentPage.value = 1
 })
 
@@ -78,8 +83,13 @@ const searchedRows = computed<ScoreSongRow[]>(() => {
 })
 
 // 検索結果に並び替えを適用した配列を作る。
+const filteredRows = computed<ScoreSongRow[]>(() => {
+  return filterRowsByConditions(searchedRows.value, filterConditions.value)
+})
+
+// 絞り込み結果に並び替えを適用した配列を作る。
 const sortedRows = computed<ScoreSongRow[]>(() => {
-  const rows = [...searchedRows.value]
+  const rows = [...filteredRows.value]
   const orderFactor = sortOrder.value === 'asc' ? 1 : -1
 
   if (rows.length <= 1) {
@@ -355,6 +365,8 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
         v-model:sort-field="sortField"
         v-model:sort-order="sortOrder"
         v-model:page-size="pageSize"
+        v-model:filter-conditions="filterConditions"
+        v-model:hide-unplayed-difficulties="hideUnplayedDifficulties"
       />
 
       <p class="app__count">
@@ -366,6 +378,7 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
         :rows="pagedRows"
         :total-items="sortedRows.length"
         :page-size="resolvedPageSize"
+        :hide-unplayed-difficulties="hideUnplayedDifficulties"
         @select-difficulty="handleSelectDifficulty"
       />
     </section>

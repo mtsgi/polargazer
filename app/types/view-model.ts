@@ -108,6 +108,57 @@ export interface ScoreSongRow {
 }
 
 /**
+ * クリア状況フィルタで判定する条件キー
+ */
+export type ClearConditionKey = 'ap' | 'fc' | 'clear' | 'play'
+
+/**
+ * フィルタの評価方法
+ */
+export type FilterConditionMode = 'only' | 'exclude'
+
+/**
+ * レベル範囲で絞り込む条件
+ */
+export interface LevelFilterCondition {
+  /** 条件種別 */
+  type: 'level'
+  /** 対象難易度 */
+  difficultyKey: DifficultyKey
+  /** 許容する最小レベル 未指定時は下限なし */
+  minLevel: number | null
+  /** 許容する最大レベル 未指定時は上限なし */
+  maxLevel: number | null
+}
+
+/**
+ * クリア状況で絞り込む条件
+ */
+export interface ClearStatusFilterCondition {
+  /** 条件種別 */
+  type: 'clearStatus'
+  /** 対象難易度 */
+  difficultyKey: DifficultyKey
+  /** 判定対象 */
+  target: ClearConditionKey
+  /** 一致のみ or 除外 */
+  mode: FilterConditionMode
+}
+
+/**
+ * 楽曲一覧で利用する絞り込み条件
+ */
+export type SongFilterCondition = LevelFilterCondition | ClearStatusFilterCondition
+
+/**
+ * 楽曲一覧の表示オプション
+ */
+export interface ScoreDisplayOptions {
+  /** プレイ記録がない難易度を非表示にするか */
+  hideUnplayedDifficulties: boolean
+}
+
+/**
  * データ取得元URLの入力値
  */
 export interface DataSourceUrls {
