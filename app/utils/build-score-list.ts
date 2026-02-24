@@ -87,6 +87,16 @@ export function buildScoreList(commonList: CommonMusic[], pdataList: NormalizedP
       best.bestHighscore = Math.max(best.bestHighscore, chart.highscore)
       best.bestAchievementRate = Math.max(best.bestAchievementRate, chart.achievement_rate)
       best.totalPlayCount += chart.play_count
+      best.maxCombo = Math.max(best.maxCombo, chart.maxcombo)
+      best.comboRank = Math.max(best.comboRank, chart.combo_rank)
+      best.scoreRank = Math.max(best.scoreRank, chart.score_rank)
+      best.clearStatus = Math.max(best.clearStatus, chart.clear_status)
+      best.clearCount += chart.clear_count
+      best.allPerfectCount += chart.perfect_clear_count
+      best.fullComboCount += chart.full_combo_count
+      best.nicePlayRank = Math.max(best.nicePlayRank, chart.nice_play_rank)
+      best.chartLevelFromPdata = Math.max(best.chartLevelFromPdata, chart.difficult)
+      best.latestUpdatedAt = pickLatestUpdatedAt(best.latestUpdatedAt, chart.updated_at)
       best.isAllPerfect = best.isAllPerfect || chart.perfect_clear_count > 0
       best.isFullCombo = best.isFullCombo || chart.full_combo_count > 0
     }
@@ -141,6 +151,16 @@ function initializeDifficultyBestMap(music: CommonMusic): Map<DifficultyKey, Dif
         bestAchievementRate: 0,
         clearRank: '-',
         totalPlayCount: 0,
+        maxCombo: 0,
+        comboRank: 0,
+        scoreRank: 0,
+        clearStatus: 0,
+        clearCount: 0,
+        allPerfectCount: 0,
+        fullComboCount: 0,
+        latestUpdatedAt: null,
+        nicePlayRank: 0,
+        chartLevelFromPdata: 0,
         isAllPerfect: false,
         isFullCombo: false,
       },
@@ -158,4 +178,32 @@ function pickLevels(music: CommonMusic): DifficultyLevels {
     influence: music.influence,
     polar: music.polar,
   }
+}
+
+/**
+ * 2つの更新日時文字列から新しい方を返す
+ */
+function pickLatestUpdatedAt(current: string | null, next: string): string {
+  if (!current) {
+    return next
+  }
+
+  const currentTime = parsePDataDateString(current)
+  const nextTime = parsePDataDateString(next)
+
+  if (currentTime === null || nextTime === null) {
+    return current >= next ? current : next
+  }
+
+  return nextTime > currentTime ? next : current
+}
+
+/**
+ * pdataの日時文字列をDate.parse可能な形式へ変換してepochミリ秒を返す
+ */
+function parsePDataDateString(value: string): number | null {
+  const normalized = value.replace(' ', 'T')
+  const parsed = Date.parse(normalized)
+
+  return Number.isNaN(parsed) ? null : parsed
 }

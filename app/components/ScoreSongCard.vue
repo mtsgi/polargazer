@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ScoreSongRow } from '../types/view-model'
+import type { DifficultyBest, ScoreSongRow } from '../types/view-model'
 
 interface Props {
   /** 表示対象の楽曲行データ */
@@ -7,6 +7,20 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  selectDifficulty: [payload: { row: ScoreSongRow, difficulty: DifficultyBest }]
+}>()
+
+/**
+ * 難易度カード押下時に親へ選択情報を通知する
+ */
+function handleSelectDifficulty(difficulty: DifficultyBest) {
+  emit('selectDifficulty', {
+    row: props.row,
+    difficulty,
+  })
+}
 </script>
 
 <template>
@@ -28,6 +42,7 @@ const props = defineProps<Props>()
         v-for="difficulty in props.row.difficultyBests"
         :key="`${props.row.musicId}-${difficulty.key}`"
         :difficulty="difficulty"
+        @select="handleSelectDifficulty"
       />
     </section>
   </article>

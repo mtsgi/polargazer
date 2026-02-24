@@ -33,6 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
   font: inherit;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  flex-shrink: 0;
 
   &:hover:enabled {
     background: var(--pg-color-accent-soft);
