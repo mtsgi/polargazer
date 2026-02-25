@@ -27,6 +27,7 @@ function formatAchievementRate(rate: number): string {
 
 <template>
   <button
+    type="button"
     class="difficulty-item"
     @click="emit('select', props.difficulty)"
   >
