@@ -60,6 +60,7 @@ function formatLocalDateTime(value: string | null): string {
 <template>
   <BaseModal
     :model-value="props.modelValue"
+    title-id="difficulty-detail-title"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <template #header>
@@ -73,7 +74,7 @@ function formatLocalDateTime(value: string | null): string {
         </div>
 
         <div class="difficulty-detail__song">
-          <h3 class="difficulty-detail__title">
+          <h3 id="difficulty-detail-title" class="difficulty-detail__title">
             {{ props.detail.row.name }}
           </h3>
           <p class="difficulty-detail__composer">

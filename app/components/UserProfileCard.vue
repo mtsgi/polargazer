@@ -115,60 +115,60 @@ function skillGradeClass(grade: string): string {
   font-weight: 900;
   font-size: 0.85rem;
   line-height: 1.4;
-  color: #1f1f1f;
+  color: var(--skill-grade-default-fg);
 }
 
 .profile-card__grade--unknown,
 .profile-card__grade--gray {
-  background-color: #9e9e9e;
-  color: #ffffff;
+  background-color: var(--skill-grade-unknown-bg);
+  color: var(--skill-grade-unknown-fg);
 }
 
 .profile-card__grade--green {
-  background-color: #9bd77b;
+  background-color: var(--skill-grade-green-bg);
 }
 
 .profile-card__grade--lime {
-  background-color: #c3e175;
+  background-color: var(--skill-grade-lime-bg);
 }
 
 .profile-card__grade--blue {
-  background-color: #92d7dc;
+  background-color: var(--skill-grade-blue-bg);
 }
 
 .profile-card__grade--cyan {
-  background-color: #99d9b2;
+  background-color: var(--skill-grade-cyan-bg);
 }
 
 .profile-card__grade--lemon {
-  background-color: #e9d94c;
+  background-color: var(--skill-grade-lemon-bg);
 }
 
 .profile-card__grade--orange {
-  background-color: #ebb759;
+  background-color: var(--skill-grade-orange-bg);
 }
 
 .profile-card__grade--coral {
-  background-color: #e5938f;
+  background-color: var(--skill-grade-coral-bg);
 }
 
 .profile-card__grade--red {
-  background-color: #e59676;
+  background-color: var(--skill-grade-red-bg);
 }
 
 .profile-card__grade--purple {
-  background-color: #a178d8;
-  color: #ffffff;
+  background-color: var(--skill-grade-purple-bg);
+  color: var(--skill-grade-purple-fg);
 }
 
 .profile-card__grade--navy {
-  background-color: #8191dc;
-  color: #ffffff;
+  background-color: var(--skill-grade-navy-bg);
+  color: var(--skill-grade-navy-fg);
 }
 
 .profile-card__grade--rainbow {
-  color: #ffffff;
-  background: linear-gradient(90deg, #ff5f6d 0%, #ffc371 20%, #ffee58 40%, #66bb6a 60%, #42a5f5 80%, #ab47bc 100%);
+  color: var(--skill-grade-rainbow-fg);
+  background: var(--skill-grade-rainbow-bg);
 }
 
 @media (min-width: 720px) {
