@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/eslint', '@nuxt/test-utils'],
+  modules: ['@nuxt/eslint', '@nuxt/test-utils', '@nuxt/fonts'],
   ssr: false,
   app: {
     head: {
@@ -14,4 +14,10 @@ export default defineNuxtConfig({
       ],
     },
   },
+  css: ['~/assets/css/main.scss'],
+  fonts: {
+    defaults: {
+      weights: [400, 900],
+    }
+  }
 })

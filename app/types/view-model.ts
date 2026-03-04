@@ -55,6 +55,26 @@ export interface DifficultyBest {
   clearRank: ClearRank
   /** その難易度の累計プレイ回数 */
   totalPlayCount: number
+  /** その難易度の最大コンボ */
+  maxCombo: number
+  /** その難易度の最高コンボランク */
+  comboRank: number
+  /** その難易度の最高スコアランク */
+  scoreRank: number
+  /** その難易度の最高クリア状況 */
+  clearStatus: number
+  /** その難易度の累計クリア回数 */
+  clearCount: number
+  /** その難易度の累計ALL PERFECT回数 */
+  allPerfectCount: number
+  /** その難易度の累計FULL COMBO回数 */
+  fullComboCount: number
+  /** その難易度の最新更新日時 */
+  latestUpdatedAt: string | null
+  /** その難易度の最高PA SKILL対象曲ランク */
+  nicePlayRank: number
+  /** pdata由来の譜面レベル */
+  chartLevelFromPdata: number
   /** その難易度でALL PERFECT達成履歴があるか */
   isAllPerfect: boolean
   /** その難易度でFULL COMBO達成履歴があるか */
@@ -85,6 +105,57 @@ export interface ScoreSongRow {
   chartCount: number
   /** 実装済み難易度(レベル>0)のみを対象にした自己ベスト一覧 */
   difficultyBests: DifficultyBest[]
+}
+
+/**
+ * クリア状況フィルタで判定する条件キー
+ */
+export type ClearConditionKey = 'ap' | 'fc' | 'clear' | 'play'
+
+/**
+ * フィルタの評価方法
+ */
+export type FilterConditionMode = 'only' | 'exclude'
+
+/**
+ * レベル範囲で絞り込む条件
+ */
+export interface LevelFilterCondition {
+  /** 条件種別 */
+  type: 'level'
+  /** 対象難易度 */
+  difficultyKey: DifficultyKey
+  /** 許容する最小レベル 未指定時は下限なし */
+  minLevel: number | null
+  /** 許容する最大レベル 未指定時は上限なし */
+  maxLevel: number | null
+}
+
+/**
+ * クリア状況で絞り込む条件
+ */
+export interface ClearStatusFilterCondition {
+  /** 条件種別 */
+  type: 'clearStatus'
+  /** 対象難易度 */
+  difficultyKey: DifficultyKey
+  /** 判定対象 */
+  target: ClearConditionKey
+  /** 一致のみ or 除外 */
+  mode: FilterConditionMode
+}
+
+/**
+ * 楽曲一覧で利用する絞り込み条件
+ */
+export type SongFilterCondition = LevelFilterCondition | ClearStatusFilterCondition
+
+/**
+ * 楽曲一覧の表示オプション
+ */
+export interface ScoreDisplayOptions {
+  /** プレイ記録がない難易度を非表示にするか */
+  hideUnplayedDifficulties: boolean
 }
 
 /**

@@ -41,9 +41,15 @@ function onChange(event: Event) {
   min-height: 38px;
   box-sizing: border-box;
   padding: 8px 10px;
-  border: 1px solid #c9c9c9;
+  border: 2px solid var(--pg-color-border);
   border-radius: 8px;
-  background: #fff;
+  background: var(--pg-color-white);
+  color: var(--pg-color-text-main);
   font: inherit;
+
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--pg-difficulty-polar) 55%, white);
+    outline-offset: 1px;
+  }
 }
 </style>

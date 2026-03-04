@@ -27,6 +27,7 @@ npm run dev
 - `common URL` / `pdata URL` を入力して手動読込
 - URLの前回値を `localStorage` に保存
 - プロフィール表示
+- PA SKILL値から算出したスキルグレード表示
 - 楽曲一覧表示
 - 難易度別自己ベスト表示
 - 検索と並び替え

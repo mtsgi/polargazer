@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import type { ScoreSongRow } from './types/view-model'
-import type { SortKey } from './components/ScoreFilterSort.vue'
+import type { DifficultyBest, DifficultyKey, ScoreSongRow, SongFilterCondition } from './types/view-model'
+import type { PageSizeOption, SortField, SortOrder } from './components/ScoreFilterSort.vue'
 import { loadDataSourceUrls, saveDataSourceUrls } from './composables/useDataSourceStorage'
 import { useScoreDataLoader } from './composables/useScoreDataLoader'
+import { filterRowsByConditions } from './utils/filter-score-rows'
 
-type DifficultyKey = 'easy' | 'normal' | 'hard' | 'influence' | 'polar'
 type DifficultyMetrics = Record<DifficultyKey, { rate: number, playCount: number }>
+
+interface SelectedDifficultyDetail {
+  /** 表示対象の楽曲行 */
+  row: ScoreSongRow
+  /** 表示対象の難易度データ */
+  difficulty: DifficultyBest
+}
 
 const DIFFICULTY_KEYS: DifficultyKey[] = ['easy', 'normal', 'hard', 'influence', 'polar']
 
@@ -15,10 +22,24 @@ const sourceUrls = ref(loadDataSourceUrls())
 const searchWordInput = ref('')
 // 検索負荷を下げるため、表示側では少し遅延した値を使う。
 const debouncedSearchWord = ref('')
-// 一覧の並び替えキー。
-const sortKey = ref<SortKey>('nameAsc')
+// 一覧の並び替え項目。
+const sortField = ref<SortField>('default')
+// 一覧の並び順。
+const sortOrder = ref<SortOrder>('asc')
+// 一覧の表示件数。
+const pageSize = ref<PageSizeOption>('50')
+// 一覧の追加絞り込み条件。
+const filterConditions = ref<SongFilterCondition[]>([])
+// 未プレイ難易度を非表示にするかどうか。
+const hideUnplayedDifficulties = ref(false)
+// 一覧の現在ページ。
+const currentPage = ref(1)
 // 初回ロード実行前かどうかを判定する。
 const hasRequestedLoad = ref(false)
+// 難易度詳細モーダル表示状態。
+const isDifficultyModalOpen = ref(false)
+// 難易度詳細モーダルの表示対象。
+const selectedDifficultyDetail = ref<SelectedDifficultyDetail | null>(null)
 
 const {
   isLoading,
@@ -45,73 +66,219 @@ onUnmounted(() => {
   }
 })
 
-// ロード済みデータから、検索・並び替えを適用した表示用配列を作る。
-const filteredRows = computed<ScoreSongRow[]>(() => {
+watch([debouncedSearchWord, sortField, sortOrder, pageSize, filterConditions], () => {
+  currentPage.value = 1
+})
+
+// ロード済みデータから検索を適用した配列を作る。
+const searchedRows = computed<ScoreSongRow[]>(() => {
   const baseRows = loadedData.value?.rows ?? []
   const keyword = debouncedSearchWord.value.trim().toLowerCase()
 
-  const searched = keyword
+  return keyword
     ? baseRows.filter((row) =>
       row.name.toLowerCase().includes(keyword) || row.composer.toLowerCase().includes(keyword),
     )
     : baseRows
+})
 
-  const rows = [...searched]
-  const metricsCache = buildDifficultyMetricsCache(rows)
+// 検索結果に並び替えを適用した配列を作る。
+const filteredRows = computed<ScoreSongRow[]>(() => {
+  return filterRowsByConditions(searchedRows.value, filterConditions.value)
+})
 
-  switch (sortKey.value) {
-    case 'bestScoreDesc':
-      rows.sort((left, right) => right.bestHighscore - left.bestHighscore)
-      break
-    case 'bestRateDesc':
-      rows.sort((left, right) => right.bestAchievementRate - left.bestAchievementRate)
-      break
-    case 'playCountDesc':
-      rows.sort((left, right) => right.totalPlayCount - left.totalPlayCount)
-      break
-    case 'easyRateDesc':
-      rows.sort((left, right) => getDifficultyRate(metricsCache, right, 'easy') - getDifficultyRate(metricsCache, left, 'easy'))
-      break
-    case 'normalRateDesc':
-      rows.sort((left, right) => getDifficultyRate(metricsCache, right, 'normal') - getDifficultyRate(metricsCache, left, 'normal'))
-      break
-    case 'hardRateDesc':
-      rows.sort((left, right) => getDifficultyRate(metricsCache, right, 'hard') - getDifficultyRate(metricsCache, left, 'hard'))
-      break
-    case 'influenceRateDesc':
-      rows.sort((left, right) => getDifficultyRate(metricsCache, right, 'influence') - getDifficultyRate(metricsCache, left, 'influence'))
-      break
-    case 'polarRateDesc':
-      rows.sort((left, right) => getDifficultyRate(metricsCache, right, 'polar') - getDifficultyRate(metricsCache, left, 'polar'))
-      break
-    case 'easyPlayCountDesc':
-      rows.sort((left, right) => getDifficultyPlayCount(metricsCache, right, 'easy') - getDifficultyPlayCount(metricsCache, left, 'easy'))
-      break
-    case 'normalPlayCountDesc':
-      rows.sort((left, right) => getDifficultyPlayCount(metricsCache, right, 'normal') - getDifficultyPlayCount(metricsCache, left, 'normal'))
-      break
-    case 'hardPlayCountDesc':
-      rows.sort((left, right) => getDifficultyPlayCount(metricsCache, right, 'hard') - getDifficultyPlayCount(metricsCache, left, 'hard'))
-      break
-    case 'influencePlayCountDesc':
-      rows.sort((left, right) => getDifficultyPlayCount(metricsCache, right, 'influence') - getDifficultyPlayCount(metricsCache, left, 'influence'))
-      break
-    case 'polarPlayCountDesc':
-      rows.sort((left, right) => getDifficultyPlayCount(metricsCache, right, 'polar') - getDifficultyPlayCount(metricsCache, left, 'polar'))
-      break
-    default:
-      rows.sort((left, right) => left.name.localeCompare(right.name))
-      break
+// 絞り込み結果に並び替えを適用した配列を作る。
+const sortedRows = computed<ScoreSongRow[]>(() => {
+  const rows = [...filteredRows.value]
+  const orderFactor = sortOrder.value === 'asc' ? 1 : -1
+
+  if (rows.length <= 1) {
+    return rows
   }
+
+  const metricsCache = buildDifficultyMetricsCache(rows)
+  const indexMap = buildRowIndexMap(rows)
+
+  rows.sort((left, right) => {
+    const comparison = compareRows(left, right, {
+      sortField: sortField.value,
+      sortOrder: sortOrder.value,
+      metricsCache,
+      indexMap,
+    })
+
+    if (comparison !== 0) {
+      return comparison
+    }
+
+    return left.name.localeCompare(right.name) * orderFactor
+  })
 
   return rows
 })
+
+// 表示件数設定を数値として解決する。
+const resolvedPageSize = computed<number>(() => {
+  if (pageSize.value === 'all') {
+    return Math.max(sortedRows.value.length, 1)
+  }
+
+  return Number(pageSize.value)
+})
+
+// 現在の総ページ数。
+const totalPages = computed<number>(() => {
+  if (sortedRows.value.length === 0) {
+    return 1
+  }
+
+  return Math.max(1, Math.ceil(sortedRows.value.length / resolvedPageSize.value))
+})
+
+watch(totalPages, (value) => {
+  if (currentPage.value > value) {
+    currentPage.value = value
+  }
+})
+
+// 現在ページに表示する配列を作る。
+const pagedRows = computed<ScoreSongRow[]>(() => {
+  if (sortedRows.value.length === 0) {
+    return []
+  }
+
+  const start = (currentPage.value - 1) * resolvedPageSize.value
+  const end = start + resolvedPageSize.value
+  return sortedRows.value.slice(start, end)
+})
+
+function compareRows(
+  left: ScoreSongRow,
+  right: ScoreSongRow,
+  context: {
+    sortField: SortField
+    sortOrder: SortOrder
+    metricsCache: Map<string, DifficultyMetrics>
+    indexMap: Map<string, number>
+  },
+): number {
+  const factor = context.sortOrder === 'asc' ? 1 : -1
+
+  switch (context.sortField) {
+    case 'default':
+      return ((context.indexMap.get(left.musicId) ?? 0) - (context.indexMap.get(right.musicId) ?? 0)) * factor
+    case 'name':
+      return left.name.localeCompare(right.name) * factor
+    case 'bestScore':
+      return (left.bestHighscore - right.bestHighscore) * factor
+    case 'bestRate':
+      return (left.bestAchievementRate - right.bestAchievementRate) * factor
+    case 'playCount':
+      return (left.totalPlayCount - right.totalPlayCount) * factor
+    case 'easyRate':
+      return (getDifficultyRate(context.metricsCache, left, 'easy') - getDifficultyRate(context.metricsCache, right, 'easy')) * factor
+    case 'normalRate':
+      return (getDifficultyRate(context.metricsCache, left, 'normal') - getDifficultyRate(context.metricsCache, right, 'normal')) * factor
+    case 'hardRate':
+      return (getDifficultyRate(context.metricsCache, left, 'hard') - getDifficultyRate(context.metricsCache, right, 'hard')) * factor
+    case 'influenceRate':
+      return (getDifficultyRate(context.metricsCache, left, 'influence') - getDifficultyRate(context.metricsCache, right, 'influence')) * factor
+    case 'polarRate':
+      return (getDifficultyRate(context.metricsCache, left, 'polar') - getDifficultyRate(context.metricsCache, right, 'polar')) * factor
+    case 'easyPlayCount':
+      return (getDifficultyPlayCount(context.metricsCache, left, 'easy') - getDifficultyPlayCount(context.metricsCache, right, 'easy')) * factor
+    case 'normalPlayCount':
+      return (getDifficultyPlayCount(context.metricsCache, left, 'normal') - getDifficultyPlayCount(context.metricsCache, right, 'normal')) * factor
+    case 'hardPlayCount':
+      return (getDifficultyPlayCount(context.metricsCache, left, 'hard') - getDifficultyPlayCount(context.metricsCache, right, 'hard')) * factor
+    case 'influencePlayCount':
+      return (getDifficultyPlayCount(context.metricsCache, left, 'influence') - getDifficultyPlayCount(context.metricsCache, right, 'influence')) * factor
+    case 'polarPlayCount':
+      return (getDifficultyPlayCount(context.metricsCache, left, 'polar') - getDifficultyPlayCount(context.metricsCache, right, 'polar')) * factor
+    case 'easyLevel':
+      return compareDifficultyLevel(left, right, 'easy', context.sortOrder)
+    case 'normalLevel':
+      return compareDifficultyLevel(left, right, 'normal', context.sortOrder)
+    case 'hardLevel':
+      return compareDifficultyLevel(left, right, 'hard', context.sortOrder)
+    case 'influenceLevel':
+      return compareDifficultyLevel(left, right, 'influence', context.sortOrder)
+    case 'polarLevel':
+      return compareDifficultyLevel(left, right, 'polar', context.sortOrder)
+    default:
+      return 0
+  }
+}
+
+/**
+ * 難易度レベルの比較結果を返す。
+ */
+function compareDifficultyLevel(left: ScoreSongRow, right: ScoreSongRow, key: DifficultyKey, order: SortOrder): number {
+  const leftLevel = left.levels[key]
+  const rightLevel = right.levels[key]
+
+  const leftUnimplemented = leftLevel === 0
+  const rightUnimplemented = rightLevel === 0
+
+  if (leftUnimplemented && !rightUnimplemented) {
+    return 1
+  }
+
+  if (!leftUnimplemented && rightUnimplemented) {
+    return -1
+  }
+
+  if (leftUnimplemented && rightUnimplemented) {
+    return 0
+  }
+
+  const factor = order === 'asc' ? 1 : -1
+  return (leftLevel - rightLevel) * factor
+}
+
+function buildRowIndexMap(rows: ScoreSongRow[]): Map<string, number> {
+  const map = new Map<string, number>()
+
+  rows.forEach((row, index) => {
+    map.set(row.musicId, index)
+  })
+
+  return map
+}
 
 // フォーム入力URLでcommon/pdataを読み込む。
 async function loadScoreData() {
   hasRequestedLoad.value = true
   saveDataSourceUrls(sourceUrls.value)
   await load(sourceUrls.value)
+}
+
+/**
+ * 難易度詳細モーダルを開く
+ */
+function handleSelectDifficulty(payload: SelectedDifficultyDetail) {
+  selectedDifficultyDetail.value = payload
+  isDifficultyModalOpen.value = true
+}
+
+/**
+ * 難易度詳細モーダルの表示状態変更を処理する
+ */
+function handleDifficultyModalVisibility(value: boolean) {
+  if (!value) {
+    closeDifficultyModal()
+    return
+  }
+
+  isDifficultyModalOpen.value = true
+}
+
+/**
+ * 難易度詳細モーダルを閉じる
+ */
+function closeDifficultyModal() {
+  isDifficultyModalOpen.value = false
+  selectedDifficultyDetail.value = null
 }
 
 /**
@@ -157,6 +324,7 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
 
   return cache
 }
+
 </script>
 
 <template>
@@ -167,14 +335,12 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
       Polargazer
     </h1>
 
-    <section class="app__panel">
-      <DataSourceForm
-        v-model:common-url="sourceUrls.commonUrl"
-        v-model:pdata-url="sourceUrls.pdataUrl"
-        :loading="isLoading"
-        @submit="loadScoreData"
-      />
-    </section>
+    <DataSourceForm
+      v-model:common-url="sourceUrls.commonUrl"
+      v-model:pdata-url="sourceUrls.pdataUrl"
+      :loading="isLoading"
+      @submit="loadScoreData"
+    />
 
     <p v-if="!hasRequestedLoad" class="app__notice">
       未読み込みです。URLを確認して「Load Data」を押してください。
@@ -196,15 +362,32 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
 
       <ScoreFilterSort
         v-model:search-word="searchWordInput"
-        v-model:sort-key="sortKey"
+        v-model:sort-field="sortField"
+        v-model:sort-order="sortOrder"
+        v-model:page-size="pageSize"
+        v-model:filter-conditions="filterConditions"
+        v-model:hide-unplayed-difficulties="hideUnplayedDifficulties"
       />
 
       <p class="app__count">
-        表示件数: {{ filteredRows.length }}
+        表示件数: {{ pagedRows.length }} / {{ sortedRows.length }}
       </p>
 
-      <ScoreSongTable :rows="filteredRows" />
+      <ScoreSongTable
+        v-model:current-page="currentPage"
+        :rows="pagedRows"
+        :total-items="sortedRows.length"
+        :page-size="resolvedPageSize"
+        :hide-unplayed-difficulties="hideUnplayedDifficulties"
+        @select-difficulty="handleSelectDifficulty"
+      />
     </section>
+
+    <DifficultyDetailModal
+      :model-value="isDifficultyModalOpen"
+      :detail="selectedDifficultyDetail"
+      @update:model-value="handleDifficultyModalVisibility"
+    />
   </main>
 </template>
 
@@ -215,6 +398,7 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
   padding: 12px;
   display: grid;
   gap: 12px;
+  color: var(--pg-color-text-main);
 }
 
 .app__title,
@@ -222,11 +406,25 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
   margin: 0;
 }
 
-.app__panel,
+.app__title {
+  text-align: center;
+  display: inline-block;
+  font-size: clamp(2.2rem, 6.2vw, 3.8rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.05;
+  color: var(--pg-color-white);
+  -webkit-text-stroke: 1px var(--pg-color-text-main);
+  text-shadow:
+    -2px -2px 0 var(--pg-color-accent-pink),
+    2px -2px 0 var(--pg-color-accent-soft),
+    -2px 2px 0 var(--pg-color-accent-soft),
+    2px 2px 0 var(--pg-color-accent-pink),
+    0 7px 0 var(--pg-color-border);
+  margin-bottom: 10px;
+}
+
 .app__songs {
-  border: 1px solid #d6d6d6;
-  border-radius: 12px;
-  padding: 12px;
   display: grid;
   gap: 12px;
 }
@@ -238,9 +436,16 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
 }
 
 .app__error {
-  border: 1px solid #d6d6d6;
+  border: 1px solid var(--pg-color-error);
   border-radius: 8px;
   padding: 8px;
+  color: var(--pg-color-error);
+  background: color-mix(in srgb, var(--pg-color-error) 10%, white);
+}
+
+.app__notice,
+.app__count {
+  color: var(--pg-color-text-sub);
 }
 
 @media (min-width: 900px) {

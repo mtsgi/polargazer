@@ -1,12 +1,36 @@
 <script setup lang="ts">
-import type { ScoreSongRow } from '../types/view-model'
+import type { DifficultyBest, ScoreSongRow } from '../types/view-model'
 
 interface Props {
   /** 表示対象の楽曲行データ */
   row: ScoreSongRow
+  /** 未プレイ難易度を非表示にするか */
+  hideUnplayedDifficulties: boolean
 }
 
 const props = defineProps<Props>()
+
+const visibleDifficulties = computed(() => {
+  if (!props.hideUnplayedDifficulties) {
+    return props.row.difficultyBests
+  }
+
+  return props.row.difficultyBests.filter((difficulty) => difficulty.totalPlayCount > 0)
+})
+
+const emit = defineEmits<{
+  selectDifficulty: [payload: { row: ScoreSongRow, difficulty: DifficultyBest }]
+}>()
+
+/**
+ * 難易度カード押下時に親へ選択情報を通知する
+ */
+function handleSelectDifficulty(difficulty: DifficultyBest) {
+  emit('selectDifficulty', {
+    row: props.row,
+    difficulty,
+  })
+}
 </script>
 
 <template>
@@ -25,9 +49,10 @@ const props = defineProps<Props>()
 
     <section class="song-card__difficulties">
       <ScoreDifficultyItem
-        v-for="difficulty in props.row.difficultyBests"
+        v-for="difficulty in visibleDifficulties"
         :key="`${props.row.musicId}-${difficulty.key}`"
         :difficulty="difficulty"
+        @select="handleSelectDifficulty"
       />
     </section>
   </article>
@@ -35,11 +60,12 @@ const props = defineProps<Props>()
 
 <style scoped lang="scss">
 .song-card {
-  border: 1px solid #d6d6d6;
+  border: 3px solid var(--pg-color-border);
   border-radius: 12px;
   padding: 12px;
   display: grid;
   gap: 10px;
+  background: var(--pg-color-white);
 }
 
 .song-card__header {
@@ -52,10 +78,16 @@ const props = defineProps<Props>()
   font-size: 1rem;
 }
 
-.song-card__composer,
+.song-card__composer {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--pg-color-text-sub);
+}
+
 .song-card__summary {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.75rem;
+  color: var(--pg-color-text-sub);
 }
 
 .song-card__difficulties {

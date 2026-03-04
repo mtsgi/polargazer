@@ -52,6 +52,10 @@ function handleSubmit() {
 
 <style scoped lang="scss">
 .source-form {
+  border: 3px solid var(--pg-color-border);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--pg-color-white);
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
@@ -60,6 +64,10 @@ function handleSubmit() {
 .source-form__field {
   display: grid;
   gap: 6px;
+}
+
+.source-form__field label {
+  color: var(--pg-color-text-sub);
 }
 
 .source-form__button {

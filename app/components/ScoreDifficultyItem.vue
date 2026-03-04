@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { DifficultyBest } from '../types/view-model'
+import DifficultyAchievementBadge from './DifficultyAchievementBadge.vue'
+import DifficultyLevelCircle from './DifficultyLevelCircle.vue'
 
 interface Props {
   /** 表示対象の難易度別自己ベスト */
@@ -8,6 +10,10 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const emit = defineEmits<{
+  select: [difficulty: DifficultyBest]
+}>()
+
 /**
  * 内部値(100倍)の達成率を表示文字列へ変換する
  */
@@ -15,75 +21,79 @@ function formatAchievementRate(rate: number): string {
   if (!rate) {
     return '-'
   }
-  return (rate / 100).toFixed(2)
+  return (rate / 100).toFixed(2) + '%'
 }
 </script>
 
 <template>
-  <article class="difficulty-item">
+  <button
+    type="button"
+    class="difficulty-item"
+    @click="emit('select', props.difficulty)"
+  >
+    <!-- 楽曲レベル -->
     <header class="difficulty-item__header">
-      <span class="difficulty-item__name">{{ props.difficulty.label.toUpperCase() }}</span>
-      <div class="difficulty-item__meta">
-        <span
-          v-if="props.difficulty.isAllPerfect"
+      <div class="difficulty-item__badge-wrap">
+        <DifficultyLevelCircle :difficulty="props.difficulty" />
+        <DifficultyAchievementBadge
+          :difficulty="props.difficulty"
           class="difficulty-item__badge"
-        >
-          AP
-        </span>
-        <span
-          v-else-if="props.difficulty.isFullCombo"
-          class="difficulty-item__badge"
-        >
-          FC
-        </span>
-        <span class="difficulty-item__level">Lv{{ props.difficulty.level }}</span>
+        />
       </div>
     </header>
 
+    <!-- 自己ベストスコア -->
     <dl class="difficulty-item__stats">
-      <div>
-        <dt>Score</dt>
-        <dd>{{ props.difficulty.bestHighscore || '-' }}</dd>
-      </div>
-      <div>
-        <dt>ACHIEVEMENT RATE</dt>
-        <dd>{{ formatAchievementRate(props.difficulty.bestAchievementRate) }}</dd>
-      </div>
       <div>
         <dt>CLEAR RANK</dt>
         <dd>{{ props.difficulty.clearRank }}</dd>
       </div>
       <div>
-        <dt>Play</dt>
-        <dd>{{ props.difficulty.totalPlayCount }}</dd>
+        <dt>ACHIEVEMENT RATE</dt>
+        <dd>{{ formatAchievementRate(props.difficulty.bestAchievementRate) }}</dd>
       </div>
     </dl>
-  </article>
+  </button>
 </template>
 
 <style scoped lang="scss">
 .difficulty-item {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  width: 100%;
+  appearance: none;
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  border: 3px solid var(--pg-color-border);
+  border-radius: 12px;
   padding: 8px;
   min-width: 0;
+  display: flex;
+  align-items: center;
+  background: var(--pg-color-white);
+  color: inherit;
+  font: inherit;
+}
+
+.difficulty-item:hover {
+  background: color-mix(in srgb, var(--pg-color-accent-soft) 12%, var(--pg-color-white));
 }
 
 .difficulty-item__header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 6px;
+  gap: 8px;
+  margin-right: 12px;
 }
 
-.difficulty-item__meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.difficulty-item__badge-wrap {
+  display: inline-flex;
 }
 
-.difficulty-item__name {
-  font-weight: 600;
+.difficulty-item__badge {
+  position: absolute;
+  top: -9px;
+  right: 8px;
 }
 
 .difficulty-item__stats {
@@ -93,19 +103,15 @@ function formatAchievementRate(rate: number): string {
   margin: 0;
 }
 
-.difficulty-item__badge {
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid #e0e0e0;
-  border-radius: 999px;
-  padding: 0 6px;
+.difficulty-item__stats dt {
+  margin: 0;
   font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.4;
+  color: var(--pg-color-text-sub);
 }
 
-.difficulty-item__stats dt,
 .difficulty-item__stats dd {
+  font-weight: 900;
   margin: 0;
 }
+
 </style>
