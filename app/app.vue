@@ -233,7 +233,10 @@ function compareDifficultyLevel(left: ScoreSongRow, right: ScoreSongRow, key: Di
   }
 
   const factor = order === 'asc' ? 1 : -1
-  return (leftLevel - rightLevel) * factor
+  // 定数表にある譜面は定数値で比較し、定数表にない譜面は整数レベル（.0扱い）を使う。
+  const leftConst = left.difficultyBests.find(b => b.key === key)?.constValue ?? leftLevel
+  const rightConst = right.difficultyBests.find(b => b.key === key)?.constValue ?? rightLevel
+  return (leftConst - rightConst) * factor
 }
 
 function buildRowIndexMap(rows: ScoreSongRow[]): Map<string, number> {
@@ -338,6 +341,7 @@ function buildDifficultyMetricsCache(rows: ScoreSongRow[]): Map<string, Difficul
     <DataSourceForm
       v-model:common-url="sourceUrls.commonUrl"
       v-model:pdata-url="sourceUrls.pdataUrl"
+      v-model:consts-url="sourceUrls.constsUrl"
       :loading="isLoading"
       @submit="loadScoreData"
     />

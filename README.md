@@ -24,12 +24,13 @@ npm run dev
 
 ## 主な機能
 
-- `common URL` / `pdata URL` を入力して手動読込
+- `common URL` / `pdata URL` / `consts URL` を入力して手動読込
 - URLの前回値を `localStorage` に保存
 - プロフィール表示
 - PA SKILL値から算出したスキルグレード表示
 - 楽曲一覧表示
 - 難易度別自己ベスト表示
+- 定数表読み込み（任意）
 - 検索と並び替え
 
 ## テスト
@@ -56,4 +57,5 @@ npm run test:nuxt -- --run
 ## データ仕様メモ
 
 - `public/common_getdata.html` / `public/pdata_getdata.html` は開発用のJSON実体
+- `public/consts.json` は開発用の定数表サンプル（キーが定数値文字列、値が `[楽曲名, 難易度キー]` の配列）
 - `pdata.score_data.usr_music_highscore.music[].chart_list.chart` は配列または単体オブジェクトの揺れを吸収して扱う

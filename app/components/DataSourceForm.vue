@@ -4,6 +4,8 @@ interface Props {
   commonUrl: string
   /** pdataデータ取得URL */
   pdataUrl: string
+  /** 定数表データ取得URL */
+  constsUrl: string
   /** 読込中フラグ */
   loading: boolean
 }
@@ -13,6 +15,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'update:commonUrl': [value: string]
   'update:pdataUrl': [value: string]
+  'update:constsUrl': [value: string]
   submit: []
 }>()
 
@@ -41,6 +44,16 @@ function handleSubmit() {
         :model-value="props.pdataUrl"
         type="url"
         @update:model-value="emit('update:pdataUrl', $event)"
+      />
+    </div>
+
+    <div class="source-form__field">
+      <label for="consts-url">consts URL</label>
+      <BaseInput
+        id="consts-url"
+        :model-value="props.constsUrl"
+        type="url"
+        @update:model-value="emit('update:constsUrl', $event)"
       />
     </div>
 
@@ -76,7 +89,7 @@ function handleSubmit() {
 
 @media (min-width: 860px) {
   .source-form {
-    grid-template-columns: 1fr 1fr auto;
+    grid-template-columns: 1fr 1fr 1fr auto;
     align-items: end;
   }
 }

@@ -146,4 +146,36 @@ describe('buildScoreList', () => {
     expect(rows[0]?.difficultyBests.every((item) => item.latestUpdatedAt === null)).toBe(true)
     expect(rows[0]?.difficultyBests.every((item) => item.maxCombo === 0)).toBe(true)
   })
+
+  it('constsMapが渡された場合、難易度BestにconstValueがセットされる', () => {
+    const constsMap = new Map<string, number>([
+      ['Song 1::influence', 13.5],
+    ])
+
+    const rows = buildScoreList(
+      [
+        {
+          music_id: 'm1',
+          genre: 1,
+          name: 'Song 1',
+          composer: 'Comp 1',
+          license: '',
+          easy: 1,
+          normal: 2,
+          hard: 3,
+          influence: 4,
+          polar: 0,
+        },
+      ],
+      [],
+      constsMap,
+    )
+
+    const influence = rows[0]?.difficultyBests.find((item) => item.key === 'influence')
+    expect(influence?.constValue).toBe(13.5)
+
+    // 定数表にない難易度は constValue が未設定
+    const hard = rows[0]?.difficultyBests.find((item) => item.key === 'hard')
+    expect(hard?.constValue).toBeUndefined()
+  })
 })

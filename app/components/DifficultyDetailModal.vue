@@ -136,7 +136,13 @@ function formatLocalDateTime(value: string | null): string {
         </div>
         <div>
           <dt>譜面レベル</dt>
-          <dd>{{ props.detail.difficulty.chartLevelFromPdata || '-' }}</dd>
+          <dd>
+            {{ props.detail.difficulty.chartLevelFromPdata || '-' }}
+            <!-- 定数表にある場合は小数点以下表示 -->
+            <span v-if="props.detail.difficulty.constValue">
+              (定数: {{ props.detail.difficulty.constValue.toFixed(1) }})
+            </span>
+          </dd>
         </div>
         <div>
           <dt>更新日時</dt>
