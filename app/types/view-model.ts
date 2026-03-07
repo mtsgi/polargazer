@@ -79,6 +79,8 @@ export interface DifficultyBest {
   isAllPerfect: boolean
   /** その難易度でFULL COMBO達成履歴があるか */
   isFullCombo: boolean
+  /** 定数表由来の定数値 定数表に登録されている楽曲のみセットされる */
+  constValue?: number
 }
 
 /**
@@ -166,7 +168,15 @@ export interface DataSourceUrls {
   commonUrl: string
   /** pdataデータURL */
   pdataUrl: string
+  /** 定数表データURL 空文字の場合は読み込まない */
+  constsUrl: string
 }
+
+/**
+ * 定数表JSONのレスポンス形式
+ * キーが定数値文字列、値が [楽曲名, 難易度キー] の配列
+ */
+export type ConstsData = Record<string, string[][]>
 
 /**
  * common/pdata読込後にUIで利用する統合データ

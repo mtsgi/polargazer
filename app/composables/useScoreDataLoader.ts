@@ -1,10 +1,11 @@
 import type { CommonResponse } from '../types/common'
 import type { PDataResponse } from '../types/pdata'
-import type { DataSourceUrls, LoadedScoreData } from '../types/view-model'
+import type { ConstsData, DataSourceUrls, LoadedScoreData } from '../types/view-model'
 import { fetchJson } from '../utils/fetch-json'
 import { normalizeCommon } from '../utils/normalize-common'
 import { extractUserProfile, normalizePDataMusic } from '../utils/normalize-pdata'
 import { buildScoreList } from '../utils/build-score-list'
+import { buildConstsMap } from '../utils/normalize-consts'
 
 /**
  * common/pdataの読込と結合を担当するcomposable。
@@ -31,11 +32,23 @@ export function useScoreDataLoader() {
         fetchJson<PDataResponse>(urls.pdataUrl),
       ])
 
+      // 定数表URLが指定されている場合は定数マップを構築する。
+      let constsMap: Map<string, number> | undefined
+      if (urls.constsUrl) {
+        try {
+          const constsResponse = await fetchJson<ConstsData>(urls.constsUrl)
+          constsMap = buildConstsMap(constsResponse)
+        }
+        catch {
+          // 定数表は任意項目のため取得失敗時はサイレントにスキップする。
+        }
+      }
+
       // レスポンスをUIで扱いやすい形へ変換する。
       const commonList = normalizeCommon(commonResponse)
       const pdataList = normalizePDataMusic(pdataResponse)
       const profile = extractUserProfile(pdataResponse)
-      const rows = buildScoreList(commonList, pdataList)
+      const rows = buildScoreList(commonList, pdataList, constsMap)
 
       loadedData.value = {
         commonList,

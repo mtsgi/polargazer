@@ -61,7 +61,7 @@ export function calculateClearRank(achievementRate: number, hasPlayed: boolean):
   return 'D'
 }
 
-export function buildScoreList(commonList: CommonMusic[], pdataList: NormalizedPDataMusic[]): ScoreSongRow[] {
+export function buildScoreList(commonList: CommonMusic[], pdataList: NormalizedPDataMusic[], constsMap?: Map<string, number>): ScoreSongRow[] {
   // 結合高速化のため、pdataを楽曲IDでマップ化する。
   const pdataMap = new Map(pdataList.map((item) => [item.musicId, item]))
 
@@ -104,6 +104,16 @@ export function buildScoreList(commonList: CommonMusic[], pdataList: NormalizedP
     // 集約が完了した後に一度だけクリアランクを算出する。
     for (const best of difficultyBestMap.values()) {
       best.clearRank = calculateClearRank(best.bestAchievementRate, best.totalPlayCount > 0)
+    }
+
+    // 定数マップが提供された場合、各難易度の定数値を設定する。
+    if (constsMap) {
+      for (const [difficultyKey, best] of difficultyBestMap.entries()) {
+        const constValue = constsMap.get(`${music.name}::${difficultyKey}`)
+        if (constValue !== undefined) {
+          best.constValue = constValue
+        }
+      }
     }
 
     const difficultyBests = Array.from(difficultyBestMap.values())

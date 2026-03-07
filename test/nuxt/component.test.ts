@@ -13,12 +13,14 @@ describe('コンポーネント表示', () => {
       props: {
         commonUrl: '/common_getdata.html',
         pdataUrl: '/pdata_getdata.html',
+        constsUrl: '/consts.json',
         loading: false,
       },
     })
 
     expect(component.text()).toContain('common URL')
     expect(component.text()).toContain('pdata URL')
+    expect(component.text()).toContain('consts URL')
   })
 
   it('ScoreSongTableで難易度別自己ベストを表示できる', async () => {
