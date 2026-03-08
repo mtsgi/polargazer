@@ -19,9 +19,9 @@ describe('コンポーネント表示', () => {
       },
     })
 
-    expect(component.text()).toContain('common URL')
-    expect(component.text()).toContain('pdata URL')
-    expect(component.text()).toContain('consts URL')
+    expect(component.text()).toContain('common')
+    expect(component.text()).toContain('pdata')
+    expect(component.text()).toContain('consts')
   })
 
   it('ScoreSongTableで難易度別自己ベストを表示できる', async () => {

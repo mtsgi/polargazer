@@ -41,7 +41,7 @@ function formatSkillValue(value: number): string {
   <div class="skill-chart-item">
     <!-- 難易度サークル -->
     <div class="skill-chart-item__circle">
-      <DifficultyLevelCircle :difficulty="(difficultyForCircle as DifficultyBest)" />
+      <DifficultyLevelCircle :difficulty="difficultyForCircle" />
     </div>
 
     <!-- 楽曲情報 -->

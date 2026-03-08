@@ -36,6 +36,7 @@ export function loadDataSourceUrls(): DataSourceUrls {
 
 /**
  * 入力URLをlocalStorageへ保存する。
+ * blob: URLはリロード後に無効になるため保存をスキップする。
  */
 export function saveDataSourceUrls(urls: DataSourceUrls): void {
   // SSR時は何もしない。
@@ -43,7 +44,13 @@ export function saveDataSourceUrls(urls: DataSourceUrls): void {
     return
   }
 
-  localStorage.setItem(COMMON_URL_KEY, urls.commonUrl)
-  localStorage.setItem(PDATA_URL_KEY, urls.pdataUrl)
-  localStorage.setItem(CONSTS_URL_KEY, urls.constsUrl)
+  if (!urls.commonUrl.startsWith('blob:')) {
+    localStorage.setItem(COMMON_URL_KEY, urls.commonUrl)
+  }
+  if (!urls.pdataUrl.startsWith('blob:')) {
+    localStorage.setItem(PDATA_URL_KEY, urls.pdataUrl)
+  }
+  if (!urls.constsUrl.startsWith('blob:')) {
+    localStorage.setItem(CONSTS_URL_KEY, urls.constsUrl)
+  }
 }

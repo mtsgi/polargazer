@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { DifficultyBest } from '../types/view-model'
 
+type DifficultyLevelCircleData = Pick<DifficultyBest, 'key' | 'label' | 'level' | 'constValue'>
+
 interface Props {
   /** 表示対象の難易度データ */
-  difficulty: DifficultyBest
+  difficulty: DifficultyLevelCircleData
 }
 
 const props = defineProps<Props>()
