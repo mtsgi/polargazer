@@ -179,6 +179,34 @@ export interface DataSourceUrls {
 export type ConstsData = Record<string, string[][]>
 
 /**
+ * SKILLタブで表示する1譜面分のSKILL行データ
+ */
+export interface SkillChartRow {
+  /** 楽曲ID */
+  musicId: string
+  /** 楽曲名 */
+  songName: string
+  /** 作曲者名 */
+  composer: string
+  /** 難易度キー */
+  difficultyKey: DifficultyKey
+  /** 画面表示用の難易度ラベル */
+  difficultyLabel: string
+  /** 整数レベル（マスター値） */
+  level: number
+  /** SKILL計算に使用した定数値（定数表値 or 整数レベル） */
+  constValue: number
+  /** 定数表に登録されていない（参考値）か否か */
+  isEstimatedConst: boolean
+  /** 最高達成率（内部値: 100倍） */
+  bestAchievementRate: number
+  /** 単曲SKILL値 */
+  skillValue: number
+  /** PA SKILL 対象譜面か（nicePlayRank > 0） */
+  isPaSkillTarget: boolean
+}
+
+/**
  * common/pdata読込後にUIで利用する統合データ
  */
 export interface LoadedScoreData {
