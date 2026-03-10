@@ -4,6 +4,8 @@ interface Props {
   commonUrl: string
   /** pdataデータ取得URL */
   pdataUrl: string
+  /** 定数表データ取得URL */
+  constsUrl: string
   /** 読込中フラグ */
   loading: boolean
 }
@@ -13,8 +15,44 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'update:commonUrl': [value: string]
   'update:pdataUrl': [value: string]
+  'update:constsUrl': [value: string]
   submit: []
 }>()
+
+// フィールドごとのファイルモードフラグ（false = URLモード）
+const commonUseFile = ref(false)
+const pdataUseFile = ref(false)
+const constsUseFile = ref(false)
+
+// URLモード時の内部URL値（props の初期値で初期化し、入力のたびに更新する）
+const internalCommonUrl = ref(props.commonUrl)
+const internalPdataUrl = ref(props.pdataUrl)
+const internalConstsUrl = ref(props.constsUrl)
+
+/**
+ * URLモードへ切り替えたとき、内部URL値を親へ再 emit して復元する
+ */
+function switchToUrl(field: 'common' | 'pdata' | 'consts') {
+  if (field === 'common') {
+    emit('update:commonUrl', internalCommonUrl.value)
+  }
+  else if (field === 'pdata') {
+    emit('update:pdataUrl', internalPdataUrl.value)
+  }
+  else {
+    emit('update:constsUrl', internalConstsUrl.value)
+  }
+}
+
+/**
+ * ファイルが選択されたとき blob URL を生成して親へ emit する
+ */
+function onFileSelected(file: File, field: 'common' | 'pdata' | 'consts') {
+  const blobUrl = URL.createObjectURL(file)
+  if (field === 'common') emit('update:commonUrl', blobUrl)
+  else if (field === 'pdata') emit('update:pdataUrl', blobUrl)
+  else emit('update:constsUrl', blobUrl)
+}
 
 // フォーム送信時に親へ読込イベントを通知する
 function handleSubmit() {
@@ -25,22 +63,77 @@ function handleSubmit() {
 <template>
   <form class="source-form" @submit.prevent="handleSubmit">
     <div class="source-form__field">
-      <label for="common-url">common URL</label>
+      <div class="source-form__label-row">
+        <label :for="commonUseFile ? 'common-file' : 'common-url'">common</label>
+        <BaseCheckbox
+          v-model="commonUseFile"
+          @update:model-value="(v) => !v && switchToUrl('common')"
+        >
+          ファイルを選択
+        </BaseCheckbox>
+      </div>
       <BaseInput
+        v-if="!commonUseFile"
         id="common-url"
-        :model-value="props.commonUrl"
+        :model-value="internalCommonUrl"
         type="url"
-        @update:model-value="emit('update:commonUrl', $event)"
+        @update:model-value="(v) => { internalCommonUrl = v; emit('update:commonUrl', v) }"
+      />
+      <BaseFileInput
+        v-else
+        id="common-file"
+        accept=".json,.html"
+        @change="onFileSelected($event, 'common')"
       />
     </div>
 
     <div class="source-form__field">
-      <label for="pdata-url">pdata URL</label>
+      <div class="source-form__label-row">
+        <label :for="pdataUseFile ? 'pdata-file' : 'pdata-url'">pdata</label>
+        <BaseCheckbox
+          v-model="pdataUseFile"
+          @update:model-value="(v) => !v && switchToUrl('pdata')"
+        >
+          ファイルを選択
+        </BaseCheckbox>
+      </div>
       <BaseInput
+        v-if="!pdataUseFile"
         id="pdata-url"
-        :model-value="props.pdataUrl"
+        :model-value="internalPdataUrl"
         type="url"
-        @update:model-value="emit('update:pdataUrl', $event)"
+        @update:model-value="(v) => { internalPdataUrl = v; emit('update:pdataUrl', v) }"
+      />
+      <BaseFileInput
+        v-else
+        id="pdata-file"
+        accept=".json,.html"
+        @change="onFileSelected($event, 'pdata')"
+      />
+    </div>
+
+    <div class="source-form__field">
+      <div class="source-form__label-row">
+        <label :for="constsUseFile ? 'consts-file' : 'consts-url'">consts</label>
+        <BaseCheckbox
+          v-model="constsUseFile"
+          @update:model-value="(v) => !v && switchToUrl('consts')"
+        >
+          ファイルを選択
+        </BaseCheckbox>
+      </div>
+      <BaseInput
+        v-if="!constsUseFile"
+        id="consts-url"
+        :model-value="internalConstsUrl"
+        type="url"
+        @update:model-value="(v) => { internalConstsUrl = v; emit('update:constsUrl', v) }"
+      />
+      <BaseFileInput
+        v-else
+        id="consts-file"
+        accept=".json,.html"
+        @change="onFileSelected($event, 'consts')"
       />
     </div>
 
@@ -66,18 +159,14 @@ function handleSubmit() {
   gap: 6px;
 }
 
-.source-form__field label {
+.source-form__label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   color: var(--pg-color-text-sub);
 }
 
 .source-form__button {
   width: fit-content;
-}
-
-@media (min-width: 860px) {
-  .source-form {
-    grid-template-columns: 1fr 1fr auto;
-    align-items: end;
-  }
 }
 </style>

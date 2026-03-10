@@ -5,6 +5,7 @@ import DataSourceForm from '../../app/components/DataSourceForm.vue'
 import ScoreFilterSort from '../../app/components/ScoreFilterSort.vue'
 import ScoreSongTable from '../../app/components/ScoreSongTable.vue'
 import UserProfileCard from '../../app/components/UserProfileCard.vue'
+import SkillChartItem from '../../app/components/SkillChartItem.vue'
 import App from '../../app/app.vue'
 
 describe('コンポーネント表示', () => {
@@ -13,12 +14,14 @@ describe('コンポーネント表示', () => {
       props: {
         commonUrl: '/common_getdata.html',
         pdataUrl: '/pdata_getdata.html',
+        constsUrl: '/consts.json',
         loading: false,
       },
     })
 
-    expect(component.text()).toContain('common URL')
-    expect(component.text()).toContain('pdata URL')
+    expect(component.text()).toContain('common')
+    expect(component.text()).toContain('pdata')
+    expect(component.text()).toContain('consts')
   })
 
   it('ScoreSongTableで難易度別自己ベストを表示できる', async () => {
@@ -366,5 +369,54 @@ describe('コンポーネント表示', () => {
     expect(component.text()).toContain('スキル')
     expect(component.text()).toContain('スキルグレード')
     expect(component.text()).toContain('Navy+')
+  })
+
+  it('SkillChartItemで楽曲名・AR・SKILL値を表示できる', async () => {
+    const component = await mountSuspended(SkillChartItem, {
+      props: {
+        row: {
+          musicId: 'm1',
+          songName: 'Test Song',
+          composer: 'Test Composer',
+          difficultyKey: 'hard',
+          difficultyLabel: 'HARD',
+          level: 11,
+          constValue: 11.3,
+          isEstimatedConst: false,
+          bestAchievementRate: 9950,
+          skillValue: 13.63,
+          isPaSkillTarget: true,
+        },
+      },
+    })
+
+    expect(component.text()).toContain('Test Song')
+    expect(component.text()).toContain('99.50%')
+    expect(component.text()).toContain('13.6300')
+    // isEstimatedConst=false のとき参考値バッジは非表示
+    expect(component.text()).not.toContain('参考値')
+  })
+
+  it('SkillChartItemでisEstimatedConst=trueのとき参考値バッジを表示する', async () => {
+    const component = await mountSuspended(SkillChartItem, {
+      props: {
+        row: {
+          musicId: 'm2',
+          songName: 'Unknown Song',
+          composer: 'Unknown',
+          difficultyKey: 'polar',
+          difficultyLabel: 'POLAR',
+          level: 13,
+          constValue: 13,
+          isEstimatedConst: true,
+          bestAchievementRate: 9800,
+          skillValue: 13.50,
+          isPaSkillTarget: false,
+        },
+      },
+    })
+
+    expect(component.text()).toContain('Unknown Song')
+    expect(component.text()).toContain('参考値')
   })
 })
