@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DifficultyBest, ScoreSongRow } from '../types/view-model'
+import { calculateChartSkill } from '../utils/calculate-chart-skill'
 import DifficultyAchievementBadge from './DifficultyAchievementBadge.vue'
 import DifficultyLevelCircle from './DifficultyLevelCircle.vue'
 
@@ -33,6 +34,21 @@ function formatAchievementRate(rate: number): string {
 
   return `${(rate / 100).toFixed(2)}%`
 }
+
+/**
+ * 単曲SKILL値を計算する（プレイ未実施の場合は null）
+ */
+const chartSkill = computed<{ value: number, isEstimated: boolean } | null>(() => {
+  if (!props.detail) return null
+  const { difficulty } = props.detail
+  if (difficulty.totalPlayCount === 0) return null
+  const isEstimated = difficulty.constValue === undefined
+  const constValue = difficulty.constValue ?? difficulty.level
+  return {
+    value: calculateChartSkill(difficulty.bestAchievementRate, constValue),
+    isEstimated,
+  }
+})
 
 /**
  * pdataの更新日時文字列をローカル日時表示へ変換する
@@ -79,6 +95,9 @@ function formatLocalDateTime(value: string | null): string {
           </h3>
           <p class="difficulty-detail__composer">
             {{ props.detail.row.composer }}
+          </p>
+          <p v-if="props.detail.difficulty.taskDirector" class="difficulty-detail__task-director">
+            Task Director: {{ props.detail.difficulty.taskDirector }}
           </p>
         </div>
       </div>
@@ -136,7 +155,23 @@ function formatLocalDateTime(value: string | null): string {
         </div>
         <div>
           <dt>譜面レベル</dt>
-          <dd>{{ props.detail.difficulty.chartLevelFromPdata || '-' }}</dd>
+          <dd>
+            {{ props.detail.difficulty.chartLevelFromPdata || '-' }}
+            <!-- 譜面メタに定数値がある場合は小数点以下表示 -->
+            <span v-if="props.detail.difficulty.constValue">
+              (定数: {{ props.detail.difficulty.constValue.toFixed(1) }})
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt>単曲SKILL</dt>
+          <dd>
+            <template v-if="chartSkill">
+              {{ chartSkill.value.toFixed(4) }}
+              <span v-if="chartSkill.isEstimated" class="difficulty-detail__estimated">(参考値)</span>
+            </template>
+            <template v-else>-</template>
+          </dd>
         </div>
         <div>
           <dt>更新日時</dt>
@@ -178,6 +213,12 @@ function formatLocalDateTime(value: string | null): string {
   font-size: 0.85rem;
 }
 
+.difficulty-detail__task-director {
+  margin: 2px 0 0;
+  color: var(--pg-color-text-sub);
+  font-size: 0.8rem;
+}
+
 .difficulty-detail__title {
   margin: 2px 0;
   font-size: 1.1rem;
@@ -211,6 +252,13 @@ function formatLocalDateTime(value: string | null): string {
 .difficulty-detail__grid dd {
   margin: 2px 0 0;
   font-weight: 900;
+}
+
+.difficulty-detail__estimated {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--pg-color-text-sub);
+  margin-left: 4px;
 }
 
 @media (min-width: 720px) {

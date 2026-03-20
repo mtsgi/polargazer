@@ -146,4 +146,44 @@ describe('buildScoreList', () => {
     expect(rows[0]?.difficultyBests.every((item) => item.latestUpdatedAt === null)).toBe(true)
     expect(rows[0]?.difficultyBests.every((item) => item.maxCombo === 0)).toBe(true)
   })
+
+  it('chartMetaMapが渡された場合、難易度Bestにメタ情報がセットされる', () => {
+    const chartMetaMap = new Map<string, { constValue?: number, taskDirector?: string }>([
+      ['Song 1::influence', { constValue: 13.5, taskDirector: 'Director A' }],
+      ['Song 1::hard', { taskDirector: 'Director B' }],
+    ])
+
+    const rows = buildScoreList(
+      [
+        {
+          music_id: 'm1',
+          genre: 1,
+          name: 'Song 1',
+          composer: 'Comp 1',
+          license: '',
+          easy: 1,
+          normal: 2,
+          hard: 3,
+          influence: 4,
+          polar: 0,
+        },
+      ],
+      [],
+      chartMetaMap,
+    )
+
+    const influence = rows[0]?.difficultyBests.find((item) => item.key === 'influence')
+    expect(influence?.constValue).toBe(13.5)
+    expect(influence?.taskDirector).toBe('Director A')
+
+    // constValueが未登録でもtaskDirectorのみ登録されていれば反映される
+    const hard = rows[0]?.difficultyBests.find((item) => item.key === 'hard')
+    expect(hard?.constValue).toBeUndefined()
+    expect(hard?.taskDirector).toBe('Director B')
+
+    // メタデータ未登録難易度は未設定
+    const easy = rows[0]?.difficultyBests.find((item) => item.key === 'easy')
+    expect(easy?.constValue).toBeUndefined()
+    expect(easy?.taskDirector).toBeUndefined()
+  })
 })
