@@ -29,5 +29,4 @@ coverage/
 # Sample Data
 public/common_getdata.html
 public/pdata_getdata.html
-public/consts.html
-public/consts.json
+public/meta.json

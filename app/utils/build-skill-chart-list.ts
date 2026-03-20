@@ -16,7 +16,7 @@ export function buildSkillChartList(rows: ScoreSongRow[]): SkillChartRow[] {
         continue
       }
 
-      // 定数表がない場合は整数レベルを定数値として扱う（参考値扱い）
+      // 譜面メタがない場合は整数レベルを定数値として扱う（参考値扱い）
       const isEstimatedConst = best.constValue === undefined
       const constValue = best.constValue ?? best.level
 

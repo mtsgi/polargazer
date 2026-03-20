@@ -1,6 +1,6 @@
 # Polargazer
 
-`common_getdata` / `pdata_getdata` を読み込み、プロフィールと楽曲別自己ベストを表示する Nuxt アプリです。
+`common_getdata` / `pdata_getdata` / `meta.json` を読み込み、プロフィールと楽曲別自己ベストを表示する Nuxt アプリです。
 
 ## 動作環境
 
@@ -24,13 +24,14 @@ npm run dev
 
 ## 主な機能
 
-- `common URL` / `pdata URL` / `consts URL` を入力して手動読込
+- `common URL` / `pdata URL` / `meta URL` を入力して手動読込
 - URLの前回値を `localStorage` に保存
 - プロフィール表示
 - PA SKILL値から算出したスキルグレード表示
 - 楽曲一覧表示（楽曲リストタブ）
 - 難易度別自己ベスト表示
-- 定数表読み込み（任意）
+- 譜面メタデータ読み込み（任意）
+- 譜面メタデータにタスクディレクターが登録されている場合、難易度詳細モーダルに表示
 - 検索と並び替え
 - SKILL計算・ランキング表示（SKILLタブ）
 
@@ -84,5 +85,8 @@ npm run test:nuxt -- --run
 ## データ仕様メモ
 
 - `public/common_getdata.html` / `public/pdata_getdata.html` は開発用のJSON
-- `public/consts.json` は開発用の定数表JSON（キーが定数値文字列、値が `[楽曲名, 難易度キー]` の配列）
+- `public/meta.json` は開発用の譜面メタデータJSON
+	- top-levelに `charts` を持ち、`charts > 曲名 > 難易度キー > 譜面メタデータ` の構造
+	- 例: `{ "charts": { "神威": { "influence": { "constValue": 13.9 } } } }`
+	- 値は譜面メタデータオブジェクト（`constValue` / `taskDirector` など、すべて任意）
 - `pdata.score_data.usr_music_highscore.music[].chart_list.chart` は配列または単体オブジェクトの揺れを吸収して扱う

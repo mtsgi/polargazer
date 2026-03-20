@@ -96,6 +96,9 @@ function formatLocalDateTime(value: string | null): string {
           <p class="difficulty-detail__composer">
             {{ props.detail.row.composer }}
           </p>
+          <p v-if="props.detail.difficulty.taskDirector" class="difficulty-detail__task-director">
+            Task Director: {{ props.detail.difficulty.taskDirector }}
+          </p>
         </div>
       </div>
     </template>
@@ -154,7 +157,7 @@ function formatLocalDateTime(value: string | null): string {
           <dt>譜面レベル</dt>
           <dd>
             {{ props.detail.difficulty.chartLevelFromPdata || '-' }}
-            <!-- 定数表にある場合は小数点以下表示 -->
+            <!-- 譜面メタに定数値がある場合は小数点以下表示 -->
             <span v-if="props.detail.difficulty.constValue">
               (定数: {{ props.detail.difficulty.constValue.toFixed(1) }})
             </span>
@@ -208,6 +211,12 @@ function formatLocalDateTime(value: string | null): string {
   margin: 0;
   color: var(--pg-color-text-sub);
   font-size: 0.85rem;
+}
+
+.difficulty-detail__task-director {
+  margin: 2px 0 0;
+  color: var(--pg-color-text-sub);
+  font-size: 0.8rem;
 }
 
 .difficulty-detail__title {

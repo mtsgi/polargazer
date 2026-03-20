@@ -1,5 +1,5 @@
 import type { CommonMusic } from '../types/common'
-import type { ClearRank, DifficultyBest, DifficultyKey, DifficultyLevels, NormalizedPDataMusic, ScoreSongRow } from '../types/view-model'
+import type { ChartMeta, ClearRank, DifficultyBest, DifficultyKey, DifficultyLevels, NormalizedPDataMusic, ScoreSongRow } from '../types/view-model'
 
 /**
  * pdataのchart_difficulty_typeをPolargazerの難易度キーに変換するマップ。
@@ -61,7 +61,7 @@ export function calculateClearRank(achievementRate: number, hasPlayed: boolean):
   return 'D'
 }
 
-export function buildScoreList(commonList: CommonMusic[], pdataList: NormalizedPDataMusic[], constsMap?: Map<string, number>): ScoreSongRow[] {
+export function buildScoreList(commonList: CommonMusic[], pdataList: NormalizedPDataMusic[], chartMetaMap?: Map<string, ChartMeta>): ScoreSongRow[] {
   // 結合高速化のため、pdataを楽曲IDでマップ化する。
   const pdataMap = new Map(pdataList.map((item) => [item.musicId, item]))
 
@@ -106,12 +106,20 @@ export function buildScoreList(commonList: CommonMusic[], pdataList: NormalizedP
       best.clearRank = calculateClearRank(best.bestAchievementRate, best.totalPlayCount > 0)
     }
 
-    // 定数マップが提供された場合、各難易度の定数値を設定する。
-    if (constsMap) {
+    // 譜面メタデータが提供された場合、難易度メタ情報を設定する。
+    if (chartMetaMap) {
       for (const [difficultyKey, best] of difficultyBestMap.entries()) {
-        const constValue = constsMap.get(`${music.name}::${difficultyKey}`)
-        if (constValue !== undefined) {
-          best.constValue = constValue
+        const chartMeta = chartMetaMap.get(`${music.name}::${difficultyKey}`)
+        if (!chartMeta) {
+          continue
+        }
+
+        if (chartMeta.constValue !== undefined) {
+          best.constValue = chartMeta.constValue
+        }
+
+        if (chartMeta.taskDirector !== undefined) {
+          best.taskDirector = chartMeta.taskDirector
         }
       }
     }

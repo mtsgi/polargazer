@@ -79,8 +79,10 @@ export interface DifficultyBest {
   isAllPerfect: boolean
   /** その難易度でFULL COMBO達成履歴があるか */
   isFullCombo: boolean
-  /** 定数表由来の定数値 定数表に登録されている楽曲のみセットされる */
+  /** 譜面メタデータ由来の定数値 メタデータに登録されている譜面のみセットされる */
   constValue?: number
+  /** 譜面メタデータ由来のタスクディレクター名 */
+  taskDirector?: string
 }
 
 /**
@@ -168,15 +170,34 @@ export interface DataSourceUrls {
   commonUrl: string
   /** pdataデータURL */
   pdataUrl: string
-  /** 定数表データURL 空文字の場合は読み込まない */
-  constsUrl: string
+  /** 譜面メタデータURL 空文字の場合は読み込まない */
+  metaUrl: string
 }
 
 /**
- * 定数表JSONのレスポンス形式
- * キーが定数値文字列、値が [楽曲名, 難易度キー] の配列
+ * 1譜面分のメタデータ
  */
-export type ConstsData = Record<string, string[][]>
+export interface ChartMeta {
+  /** 譜面定数 任意 */
+  constValue?: number
+  /** タスクディレクター名 任意 */
+  taskDirector?: string
+  /** 将来追加される任意メタデータ */
+  [key: string]: unknown
+}
+
+/**
+ * 譜面メタデータJSONのレスポンス形式
+ */
+export type SongChartMeta = Partial<Record<DifficultyKey, ChartMeta>>
+
+/**
+ * 譜面メタデータJSONのレスポンス形式
+ */
+export interface MetaData {
+  /** charts > 曲名 > 難易度キー > 譜面メタデータ */
+  charts?: Record<string, SongChartMeta>
+}
 
 /**
  * SKILLタブで表示する1譜面分のSKILL行データ
@@ -194,9 +215,9 @@ export interface SkillChartRow {
   difficultyLabel: string
   /** 整数レベル（マスター値） */
   level: number
-  /** SKILL計算に使用した定数値（定数表値 or 整数レベル） */
+  /** SKILL計算に使用した定数値（譜面メタ値 or 整数レベル） */
   constValue: number
-  /** 定数表に登録されていない（参考値）か否か */
+  /** 譜面メタに登録されていない（参考値）か否か */
   isEstimatedConst: boolean
   /** 最高達成率（内部値: 100倍） */
   bestAchievementRate: number

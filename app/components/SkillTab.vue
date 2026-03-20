@@ -86,11 +86,11 @@ function skillGradeClass(grade: string): string {
 }
 
 /**
- * PA SKILL値を小数点2桁で表示する
+ * PA SKILL値を小数点4桁で表示する
  */
 function formatSkillValue(value: number | null): string {
   if (value === null) return '-'
-  return value.toFixed(2)
+  return value.toFixed(4)
 }
 </script>
 

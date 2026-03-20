@@ -63,7 +63,7 @@ function formatSkillValue(value: number): string {
     <!-- 単曲SKILL値 -->
     <div class="skill-chart-item__skill">
       <span class="skill-chart-item__skill-value">{{ formatSkillValue(props.row.skillValue) }}</span>
-      <!-- 定数表にない場合は参考値バッジを表示 -->
+        <!-- 譜面メタにない場合は参考値バッジを表示 -->
       <span v-if="props.row.isEstimatedConst" class="skill-chart-item__estimated-badge">
         参考値
       </span>

@@ -226,7 +226,7 @@ function compareDifficultyLevel(left: ScoreSongRow, right: ScoreSongRow, key: Di
   }
 
   const factor = order === 'asc' ? 1 : -1
-  // 定数表にある譜面は定数値で比較し、定数表にない譜面は整数レベル（.0扱い）を使う。
+  // 譜面メタに定数値がある譜面はその値で比較し、ない譜面は整数レベル（.0扱い）を使う。
   const leftConst = left.difficultyBests.find(b => b.key === key)?.constValue ?? leftLevel
   const rightConst = right.difficultyBests.find(b => b.key === key)?.constValue ?? rightLevel
   return (leftConst - rightConst) * factor
