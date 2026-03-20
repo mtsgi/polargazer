@@ -37,7 +37,7 @@ async function loadScoreData() {
     <DataSourceForm
       v-model:common-url="sourceUrls.commonUrl"
       v-model:pdata-url="sourceUrls.pdataUrl"
-      v-model:consts-url="sourceUrls.constsUrl"
+      v-model:meta-url="sourceUrls.metaUrl"
       :loading="isLoading"
       @submit="loadScoreData"
     />

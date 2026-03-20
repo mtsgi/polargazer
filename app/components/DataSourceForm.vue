@@ -4,8 +4,8 @@ interface Props {
   commonUrl: string
   /** pdataデータ取得URL */
   pdataUrl: string
-  /** 定数表データ取得URL */
-  constsUrl: string
+  /** 譜面メタデータ取得URL */
+  metaUrl: string
   /** 読込中フラグ */
   loading: boolean
 }
@@ -15,24 +15,24 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'update:commonUrl': [value: string]
   'update:pdataUrl': [value: string]
-  'update:constsUrl': [value: string]
+  'update:metaUrl': [value: string]
   submit: []
 }>()
 
 // フィールドごとのファイルモードフラグ（false = URLモード）
 const commonUseFile = ref(false)
 const pdataUseFile = ref(false)
-const constsUseFile = ref(false)
+const metaUseFile = ref(false)
 
 // URLモード時の内部URL値（props の初期値で初期化し、入力のたびに更新する）
 const internalCommonUrl = ref(props.commonUrl)
 const internalPdataUrl = ref(props.pdataUrl)
-const internalConstsUrl = ref(props.constsUrl)
+const internalMetaUrl = ref(props.metaUrl)
 
 /**
  * URLモードへ切り替えたとき、内部URL値を親へ再 emit して復元する
  */
-function switchToUrl(field: 'common' | 'pdata' | 'consts') {
+function switchToUrl(field: 'common' | 'pdata' | 'meta') {
   if (field === 'common') {
     emit('update:commonUrl', internalCommonUrl.value)
   }
@@ -40,18 +40,18 @@ function switchToUrl(field: 'common' | 'pdata' | 'consts') {
     emit('update:pdataUrl', internalPdataUrl.value)
   }
   else {
-    emit('update:constsUrl', internalConstsUrl.value)
+    emit('update:metaUrl', internalMetaUrl.value)
   }
 }
 
 /**
  * ファイルが選択されたとき blob URL を生成して親へ emit する
  */
-function onFileSelected(file: File, field: 'common' | 'pdata' | 'consts') {
+function onFileSelected(file: File, field: 'common' | 'pdata' | 'meta') {
   const blobUrl = URL.createObjectURL(file)
   if (field === 'common') emit('update:commonUrl', blobUrl)
   else if (field === 'pdata') emit('update:pdataUrl', blobUrl)
-  else emit('update:constsUrl', blobUrl)
+  else emit('update:metaUrl', blobUrl)
 }
 
 // フォーム送信時に親へ読込イベントを通知する
@@ -114,26 +114,26 @@ function handleSubmit() {
 
     <div class="source-form__field">
       <div class="source-form__label-row">
-        <label :for="constsUseFile ? 'consts-file' : 'consts-url'">consts</label>
+        <label :for="metaUseFile ? 'meta-file' : 'meta-url'">meta</label>
         <BaseCheckbox
-          v-model="constsUseFile"
-          @update:model-value="(v) => !v && switchToUrl('consts')"
+          v-model="metaUseFile"
+          @update:model-value="(v) => !v && switchToUrl('meta')"
         >
           ファイルを選択
         </BaseCheckbox>
       </div>
       <BaseInput
-        v-if="!constsUseFile"
-        id="consts-url"
-        :model-value="internalConstsUrl"
+        v-if="!metaUseFile"
+        id="meta-url"
+        :model-value="internalMetaUrl"
         type="url"
-        @update:model-value="(v) => { internalConstsUrl = v; emit('update:constsUrl', v) }"
+        @update:model-value="(v) => { internalMetaUrl = v; emit('update:metaUrl', v) }"
       />
       <BaseFileInput
         v-else
-        id="consts-file"
+        id="meta-file"
         accept=".json,.html"
-        @change="onFileSelected($event, 'consts')"
+        @change="onFileSelected($event, 'meta')"
       />
     </div>
 

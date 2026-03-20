@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import type { ScoreSongRow } from '../../app/types/view-model'
 import DataSourceForm from '../../app/components/DataSourceForm.vue'
+import DifficultyDetailModal from '../../app/components/DifficultyDetailModal.vue'
 import ScoreFilterSort from '../../app/components/ScoreFilterSort.vue'
 import ScoreSongTable from '../../app/components/ScoreSongTable.vue'
 import UserProfileCard from '../../app/components/UserProfileCard.vue'
@@ -14,14 +15,14 @@ describe('コンポーネント表示', () => {
       props: {
         commonUrl: '/common_getdata.html',
         pdataUrl: '/pdata_getdata.html',
-        constsUrl: '/consts.json',
+        metaUrl: '/meta.json',
         loading: false,
       },
     })
 
     expect(component.text()).toContain('common')
     expect(component.text()).toContain('pdata')
-    expect(component.text()).toContain('consts')
+    expect(component.text()).toContain('meta')
   })
 
   it('ScoreSongTableで難易度別自己ベストを表示できる', async () => {
@@ -349,6 +350,109 @@ describe('コンポーネント表示', () => {
   it('app.vueは初期表示で未読み込みメッセージを表示する', async () => {
     const component = await mountSuspended(App)
     expect(component.text()).toContain('未読み込みです。URLを確認して「Load Data」を押してください。')
+  })
+
+  it('DifficultyDetailModalでtaskDirectorが登録されている場合に表示できる', async () => {
+    const component = await mountSuspended(DifficultyDetailModal, {
+      props: {
+        modelValue: true,
+        detail: {
+          row: {
+            musicId: 'm1',
+            name: 'Song 1',
+            composer: 'Comp',
+            genre: 1,
+            levels: {
+              easy: 1,
+              normal: 2,
+              hard: 3,
+              influence: 4,
+              polar: 5,
+            },
+            bestHighscore: 123456,
+            bestAchievementRate: 9987,
+            totalPlayCount: 10,
+            chartCount: 1,
+            difficultyBests: [],
+          },
+          difficulty: {
+            key: 'hard',
+            label: 'hard',
+            level: 3,
+            bestHighscore: 120000,
+            bestAchievementRate: 9900,
+            clearRank: 'SSS',
+            totalPlayCount: 4,
+            maxCombo: 100,
+            comboRank: 7,
+            scoreRank: 8,
+            clearStatus: 3,
+            clearCount: 4,
+            allPerfectCount: 0,
+            fullComboCount: 2,
+            latestUpdatedAt: '2025-01-02 01:02:03',
+            nicePlayRank: 3,
+            chartLevelFromPdata: 3,
+            isAllPerfect: false,
+            isFullCombo: true,
+            taskDirector: 'Director A',
+          },
+        },
+      },
+    })
+
+    expect(component.text()).toContain('Task Director: Director A')
+  })
+
+  it('DifficultyDetailModalでtaskDirector未登録時は表示しない', async () => {
+    const component = await mountSuspended(DifficultyDetailModal, {
+      props: {
+        modelValue: true,
+        detail: {
+          row: {
+            musicId: 'm1',
+            name: 'Song 1',
+            composer: 'Comp',
+            genre: 1,
+            levels: {
+              easy: 1,
+              normal: 2,
+              hard: 3,
+              influence: 4,
+              polar: 5,
+            },
+            bestHighscore: 123456,
+            bestAchievementRate: 9987,
+            totalPlayCount: 10,
+            chartCount: 1,
+            difficultyBests: [],
+          },
+          difficulty: {
+            key: 'hard',
+            label: 'hard',
+            level: 3,
+            bestHighscore: 120000,
+            bestAchievementRate: 9900,
+            clearRank: 'SSS',
+            totalPlayCount: 4,
+            maxCombo: 100,
+            comboRank: 7,
+            scoreRank: 8,
+            clearStatus: 3,
+            clearCount: 4,
+            allPerfectCount: 0,
+            fullComboCount: 2,
+            latestUpdatedAt: '2025-01-02 01:02:03',
+            nicePlayRank: 3,
+            chartLevelFromPdata: 3,
+            isAllPerfect: false,
+            isFullCombo: true,
+          },
+        },
+      },
+    })
+
+    expect(component.text()).not.toContain('Task Director')
   })
 
   it('UserProfileCardでPA SKILLグレードを表示できる', async () => {

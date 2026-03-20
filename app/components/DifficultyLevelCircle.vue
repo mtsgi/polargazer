@@ -10,7 +10,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// 定数値の小数部を ".5" 形式で抽出する。定数表にない譜面（constValue が未定義）は null を返す。
+// 定数値の小数部を ".5" 形式で抽出する。譜面メタにない譜面（constValue が未定義）は null を返す。
 const constDecimal = computed<string | null>(() => {
   const v = props.difficulty.constValue
   if (v === undefined) return null

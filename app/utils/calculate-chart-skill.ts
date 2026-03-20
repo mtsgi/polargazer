@@ -12,7 +12,7 @@ const AR_SCALE = 100
 /**
  * 達成率（%）に応じたスコア補正値を計算する
  * @param achievementRateInternal - 達成率の内部値（100倍: 10000 = 100%）
- * @param difficultyConst - 譜面定数（定数表にない場合はレベル整数値）
+ * @param difficultyConst - 譜面定数（譜面メタにない場合はレベル整数値）
  * @returns スコア補正値
  */
 export function calculateScoreBonus(achievementRateInternal: number, difficultyConst: number): number {
@@ -61,7 +61,7 @@ export function calculateScoreBonus(achievementRateInternal: number, difficultyC
 /**
  * 単曲SKILL値を計算する
  * @param achievementRateInternal - 達成率の内部値（100倍: 10000 = 100%）
- * @param difficultyConst - 譜面定数（定数表にない場合はレベル整数値）
+ * @param difficultyConst - 譜面定数（譜面メタにない場合はレベル整数値）
  * @returns 単曲SKILL値（譜面定数 + スコア補正値）
  */
 export function calculateChartSkill(achievementRateInternal: number, difficultyConst: number): number {

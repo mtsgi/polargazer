@@ -76,7 +76,7 @@ describe('buildSkillChartList', () => {
     expect(result[0]?.bestAchievementRate).toBe(9800)
   })
 
-  it('定数表あり: isEstimatedConst = false かつ constValue に定数値が入る', () => {
+  it('譜面メタに定数値がある場合: isEstimatedConst = false かつ constValue に定数値が入る', () => {
     const rows = [
       makeRow({
         difficultyBests: [
