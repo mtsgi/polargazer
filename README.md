@@ -86,7 +86,4 @@ npm run test:nuxt -- --run
 
 - `public/common_getdata.html` / `public/pdata_getdata.html` は開発用のJSON
 - `public/meta.json` は開発用の譜面メタデータJSON
-	- top-levelに `charts` を持ち、`charts > 曲名 > 難易度キー > 譜面メタデータ` の構造
-	- 例: `{ "charts": { "神威": { "influence": { "constValue": 13.9 } } } }`
-	- 値は譜面メタデータオブジェクト（`constValue` / `taskDirector` など、すべて任意）
 - `pdata.score_data.usr_music_highscore.music[].chart_list.chart` は配列または単体オブジェクトの揺れを吸収して扱う
